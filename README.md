@@ -29,7 +29,7 @@ Fully tested using :
 ```
     $ vi hosts_inventory.yml 
 ``` 
-6. Follow the instructions in each role/<role>/README.md file
+6. Follow the instructions in each role/\<role\>/README.md file
 
 7. To manage selinux, Ansible requires the installation of a module using the following command :
 ```
@@ -39,7 +39,7 @@ Fully tested using :
 8. Run the playbook
 ```
     $ ansible-playbook -i hosts_inventory.yml Kubernetes_masters_workers.yml -K
-        ... when prompted, enter the target account passphrase (as used by sudo)
+        ... when prompted, enter the target account SSH passphrase (as used by sudo)
 ```
 9. After the run has completed without error, log onto the master node using the account created at step 1 and use kubectl to manage the cluster. The kubeconfig file is copied locally, too, so that you can manage the cluster from your Ansible host using the following command :
 ```
@@ -162,7 +162,7 @@ Fully tested using :
             └── main.yml
 ```
 # TODO
-* Full tests with Kubernetes nodes running Ubuntu 20.04 LTS or higher
+* Full tests with Kubernetes nodes running Ubuntu 22.04 LTS or higher
 * Full tests with Cilium CDN on both OS family
 * Full tests with Weave CDN on both OS family
 * Role to apply CIS Benchmarks 1.23 recommandations
