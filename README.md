@@ -4,11 +4,11 @@ Note that the playbook detects if target OS is Ubuntu or Redhat/Centos/Rocky-Lin
 So there are variables specific to each OS.   
 
 Fully tested using :
-* Ansible 2.9.6 on Ubuntu 20.04 LTS
-* Rocky-linux 8 as Kubernetes cluster nodes (should work on CentOS 8 and RedHat 8 as well)
-* CRI-O 1.23 as container runtime
-* Kubernetes 1.23
-* Calico as Container Network Interface (CNI), but ready to install Antrea, Cilium or Weave instead (see roles/cni/README.md)
+* Ansible 2.10.8 on Ubuntu 22.04 LTS
+* Rocky-linux 9.2 as Kubernetes cluster nodes (so it should work on CentOS 9 and RedHat 9 as well)
+* CRI-O 1.24 as container runtime
+* Kubernetes 1.27
+* Calico as Container Network Interface (CNI), but ready soon to install Antrea, Cilium or Weave instead (see roles/cni/README.md)
 * HAproxy as ingress controller
 
 ## Main steps to execute this Ansible playbook :
