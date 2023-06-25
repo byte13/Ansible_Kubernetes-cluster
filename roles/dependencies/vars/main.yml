@@ -1,0 +1,27 @@
+---
+# vars file for k8s dependencies on Ubuntu or Rocky-Linux/Centos/Redhat
+#
+######################################################
+# Common variables
+#
+# If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
+dependencies_display_facts: "no"
+# Helm URL
+dependencies_helm_URL: "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
+#
+# End of common varibles
+######################################################
+######################################################
+# CentOS specific
+#
+#
+# End of CentOS specific
+######################################################
+
+######################################################
+# Ubuntu specific
+#
+#
+# End of Ubuntu specific
+######################################################
+

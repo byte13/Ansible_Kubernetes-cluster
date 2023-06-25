@@ -1,0 +1,224 @@
+---
+# tasks file for k8s
+
+- name: "Show facts available on the system"
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: k8s_display_facts == "yes"
+
+# selinux block requires to install a module using "ansible-galaxy collection install ansible.posix"
+- name: "Set selinux to permissive mode during installation"
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+  when: centos_selinux == "yes"
+
+#- name: "Ensure selinux remains permissive accross reboots during initialization of Kubernetes"
+#  replace:
+#    path: /etc/sysconfig/selinux 
+#    regexp: '^([^#].*?\sSELINUX=enforcing\s+sw\s+.*)$'
+#    replace: 'SELINUX=permissive'
+#  when: centos_selinux == "yes"
+
+- name: "Set firewall rules on k8s master nodes on CentOS/RedHat/Rocky-Linux"
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - 2379-2380/tcp
+    - 6443/tcp
+    - 10250/tcp
+    - 10251/tcp
+    - 10252/tcp
+    - 10255/tcp
+  when: inventory_hostname in groups['k8smasternodes'] 
+  notify:
+    - restart firewalld
+
+- name: "Disable memory swapping to disk since kubernetes cannot work with swap enabled"
+  shell: |
+    swapoff -a
+    # when: kubernetes_installed is changed
+
+- name: "Disable memory swapping to disk in fstab since kubernetes cannot work with swap enabled"
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+  when: ansible_facts['os_family']|lower == 'redhat'
+
+- name: "Disable memory swapping to disk in fstab since kubernetes cannot work with swap enabled"
+  replace:
+    path: /etc/fstab
+    #regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    regexp: '^(\/dev\/mapper\/rl-swap)'
+    replace: '# \1'
+  when: ansible_facts['os_family']|lower == 'rocky'
+
+# Set overlay and br_netfilter kernel modules to be loaded on system startup 
+- name: "Set overlay and br_netfilter kernel modules to be loaded on system startup"
+  lineinfile:
+    dest: /etc/modules-load.d/crio.conf 
+    line: "{{ item }}"
+    state: present
+    create: yes
+    backup: yes
+  loop:
+    - overlay
+    - br_netfilter
+
+# Load overlay and br_netfilter kernel modules
+- name: "Activate overlay and br_netfilter kernel modules"
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - overlay
+    - br_netfilter
+
+# Installation of kubeadm, kubelet and kubectl 
+- name: "Add Kubernetes {{ k8s_version }} Kubernetes yum repository"
+  yum_repository:
+    name: "{{ centos_k8s_reponame1 }}"
+    description: "{{ centos_k8s_repodesc1 }}" 
+    baseurl: "{{ centos_k8s_repobaseurl1 }}"
+    gpgcheck: yes
+    gpgkey: "{{ centos_k8s_repogpgkey1 }}"
+
+- name: "Stop kubelet"
+  systemd:
+    name: kubelet
+    state: stopped
+  when: k8s_reset_cluster == "yes"
+
+- name: "Uninstall Kubernetes {{ k8s_version }} packages: {{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}, {{ centos_kubectl_pkgname }}"
+  dnf:
+    name:
+      - "{{ centos_kubeadm_pkgname }}"
+      - "{{ centos_kubelet_pkgname }}"
+      - "{{ centos_kubectl_pkgname }}"
+    state: absent
+    update_cache: yes
+  when: k8s_reset_cluster == "yes"
+
+- name: "Recursively remove /etc/kubernetes"
+  ansible.builtin.file:
+    path: /etc/kubernetes
+    state: absent
+  when: k8s_reset_cluster == "yes"
+
+- name: "Install Kubernetes {{ k8s_version }} packages: {{ centos_tc_pkgname }}, {{ centos_nettools_pkgname }},{{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}, {{ centos_kubectl_pkgname }}"
+  dnf:
+    name:
+      - "{{ centos_tc_pkgname }}"
+      - "{{ centos_nettools_pkgname }}"
+      - "{{ centos_kubeadm_pkgname }}"
+      - "{{ centos_kubelet_pkgname }}"
+      - "{{ centos_kubectl_pkgname }}"
+    state: present
+    update_cache: yes
+  notify:
+    - enable kubelet 
+
+# Upload kubelet configuration file 
+- name: "Experimental - Upload kubelet configuration file"
+  template:
+    src:   cluster-kubelet-config.j2
+    dest:  "{{ k8s_cluster_kubelet_configfile }}"
+    owner: root
+    group: root
+    mode:  0640
+
+# Upload kubelet arguments configuration file 
+- name: "Upload kubelet arguments configuration file"
+  template:
+    src:   kubelet.j2
+    dest:  "{{ k8s_kubelet_extraargs_destfile }}"
+    owner: root
+    group: root
+    mode:  0640
+  notify:
+    - reload systemd
+
+# Initialize Kubernetes cluster using kubeadm
+- name: "Reset cluster (set k8s_reset_cluster variable to 'no' to not re-initialize the cluster)"
+  command: kubeadm reset -f
+  when: k8s_reset_cluster == "yes"
+ 
+- name: Initialize Kubernetes cluster using kubeadm 
+  command: kubeadm init --pod-network-cidr={{ k8s_pods_subnet }} --service-cidr={{ k8s_services_subnet }}
+  #command: kubeadm init --config={{ k8s_cluster_kubelet_configfile }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (k8s_reset_cluster == "yes")
+
+# Copy kubeconfig in $HOME/.kube/config
+- name: "Create ~{{ remote_user }}/.kube directory on target node"
+  file:
+    path: ~{{ remote_user }}/.kube
+    state: directory
+    owner: "{{ remote_user }}"
+    mode: 0750
+
+- name: "Copy /etc/kubernetes/admin.conf to ~{{ remote_user }}/.kube/config on target node"
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: ~{{ remote_user }}/.kube/config
+    remote_src: yes
+    backup: yes
+    owner: "{{ remote_user }}"
+    mode: 0600
+
+# Get token to join workers to the cluster 
+- name: "Get token to join workers to the cluster"
+  become: no
+  shell: kubeadm token create --print-join-command
+  register: kubernetes_join_worker_command
+  when: inventory_hostname in groups['k8smasternodes'] 
+
+#- debug:
+#  msg: "{{ kubernetes_join_worker_command.stdout }}"
+# Save join command for workers in local file
+- name: "Save join command for workers in local {{ k8s_join_dir }}/{{ inventory_hostname }}_{{ k8s_join_worker_file }}"
+  become: no
+  local_action:
+    copy content="{{ kubernetes_join_worker_command.stdout_lines[0] }}" dest="{{ k8s_join_dir }}/{{ inventory_hostname }}_{{ k8s_join_worker_file }}" mode=0600
+  when: inventory_hostname in groups['k8smasternodes'] 
+
+# Create soft link to join command file to be used later on worker nodes 
+- name: "Create soft link to {{ k8s_join_workers_dir }}/{{ inventory_hostname }}_{{ k8s_join_workers_file }}"
+  become: no
+  local_action:
+    command ln -s -f {{ inventory_hostname }}_{{ k8s_join_worker_file }} {{ k8s_join_worker_file }}
+  when: inventory_hostname in groups['k8smasternodes'] 
+
+# Retrieve kubeconfig file under {{ k8s_kubeconfig_dir }}
+- name: "Retrieve kubeconfig file under {{ k8s_kubeconfig_dir }}. To manage the cluster, use kubectl --kubeconfig={{ inventory_hostname }}.conf ..."
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ k8s_kubeconfig_dir }}/{{ inventory_hostname }}_admin.conf"
+    flat: yes
+    validate_checksum: yes
+    mode: 0600
+    backup: yes
+  when: inventory_hostname in groups['k8smasternodes'] 
+
+- name: "Restart kubelet" 
+  service:
+    name: kubelet 
+    state: restarted
+    enabled: yes
+
+- name: "Set selinux back to mode defined in centos_selinux_state variable in role/k8s/vars/main.yml (current value : {{ centos_selinux_state }})"
+  ansible.posix.selinux:
+    policy: targeted
+    state: "{{ centos_selinux_state }}"
+  when: centos_selinux == "yes"
+
+#- name: "Ensure selinux remains enforcing accross reboots after initialization of Kubernetes on" 
+#  replace:
+#  path: /etc/sysconfig/selinux 
+#  regexp: '^([^#].*?\sSELINUX=permissive\s+sw\s+.*)$'
+#  replace: 'SELINUX=enforcing'
+#  when: centos_selinux == "yes"

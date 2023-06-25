@@ -1,0 +1,62 @@
+---
+# tasks file  to deply Keycloak
+# Create directory on target node to contain Keycloak persistent definitions 
+- name: Create {{ centos_keycloak_hostpath }} directory on target node
+  file:
+    path: "{{ centos_keycloak_hostpath }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+# Set Keycloak config file (may not be required, to be tested)
+#- name: Upload Keycloak config to {{ centos_keycloak_configfile }}
+#  template:
+#    src: Keycloak_configfile.j2
+#    dest: "{{ centos_keycloak_configfile }}"
+#    owner: root
+#    group: root
+#    mode:  0640
+
+# Deploy Keycloak 
+- name: Deploy Keycloak 
+  become: no
+  shell: kubectl apply -f {{ keycloak_deployment_url }} -n {{ keycloak_namespace }}
+  when: inventory_hostname in groups['k8smasternodes'] && oidc_provider == "keycloak"
+
+# Define ingress route to Keycloak service
+- name: Define ingress route to Keyclak service
+  become: no
+  shell: |
+    wget -q -O - {{ keycloak_ingress_url }} |
+    sed "s/KEYCLOAK_HOST/{{ keycloak_ingress_fqdn }}/" |
+    kubectl create -n {{ keycloak_namespace }} -f - 
+  when: inventory_hostname in groups['k8smasternodes'] && oidc_provider == "keycloak"
+
+
+# Modify apiserver static pod manifest to add volume mount point for Keycloak
+- name: Modify {{ k8s_apiserver_manifest }} to add volume mount point for Keycloak 
+  blockinfile:
+    marker_begin: "Begin marker -"
+    marker: "# {mark} Ansible edit : MountPath for Keycloak"
+    marker_end: "End marker -"
+    block: |2
+          - mountPath: {{ centos_keycloak_directory }}
+            name: keycloak-directory 
+            readOnly: false
+    path: "{{ k8s_apiserver_manifest }}"
+    insertafter: '^[\s]*volumeMounts\:[\s]*$'
+
+# Modify apiserver static pod manifest to add volume host path for Keycloak 
+- name: Modify {{ k8s_apiserver_manifest }} to add host path for Keycloak 
+  blockinfile:
+    marker_begin: "Begin marker -"
+    marker: "# {mark} Ansible edit : host path for Keycloak"
+    marker_end: "End marker -"
+    block: |2
+        - hostPath:
+            path: {{ centos_keycloak_hostpath }}
+            type: Directory
+          name: keycloak-directory 
+    path: "{{ k8s_apiserver_manifest }}"
+    insertafter: '^[\s]*volumes\:[\s]*$'

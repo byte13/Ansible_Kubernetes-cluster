@@ -1,0 +1,7 @@
+---
+# tasks file for k8s CNI
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: dependencies_display_facts == "yes"

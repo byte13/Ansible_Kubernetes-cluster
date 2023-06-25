@@ -1,0 +1,45 @@
+---
+# handlers file for k8s 
+- name: reload systemd
+  systemd:
+    daemon_reload: yes 
+
+- name: reload firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
+    daemon_reload: yes 
+
+- name: restart firewalld
+  systemd:
+    name: firewalld
+    state: restarted
+    daemon_reload: yes 
+
+- name: enable kubelet
+  systemd:
+    name: kubelet 
+    enabled: yes
+    daemon_reload: yes 
+
+- name: start kubelet
+  systemd:
+    name: kubelet 
+    state: started
+    daemon_reload: yes 
+
+- name: reload kubelet
+  systemd:
+    name: kubelet
+    state: reloaded
+    daemon_reload: yes 
+
+- name: restart kubelet
+  systemd:
+    name: kubelet
+    state: restarted
+    daemon_reload: yes 
+
+- name: restart apiserver
+  become: no
+  shell: kubectl delete pod/kube-apiserver-master-k8s -n kube-system

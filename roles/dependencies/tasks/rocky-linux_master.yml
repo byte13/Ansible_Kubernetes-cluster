@@ -1,0 +1,32 @@
+---
+# tasks file for k8s dependencies
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: dependencies_display_facts == "yes"
+
+- name: Install the latest version of curl
+  become: yes
+  dnf:
+    name: curl
+    state: latest
+  when: inventory_hostname in groups['k8smasternodes']
+
+- name: "Get script to install Helm"
+  get_url:
+    url: "{{ dependencies_helm_URL }}"
+    dest: /tmp
+    force: "yes"
+    mode: '0700'
+  register: retval 
+
+#- name: "Display name of script"
+#  debug:
+#    var: retval 
+
+- name: "Run script to install Helm, then remove script"
+  shell: |
+    "{{ retval.dest }}" 
+    rm -f "{{ retval.dest }}" 
+  when: inventory_hostname in groups['k8smasternodes']

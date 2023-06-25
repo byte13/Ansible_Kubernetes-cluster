@@ -1,0 +1,44 @@
+---
+# vars file for using OIDC Provider 
+#
+######################################################
+# Common variables
+#
+oidc_provider: "keycloak"
+keycloak_namespace: "keycloak"
+keycloak_deployment_url: "https://raw.githubusercontent.com/keycloak/keycloak-quickstarts/latest/kubernetes-examples/keycloak.yaml"
+keycloak_helm_repository: "haproxytech https://haproxytech.github.io/helm-charts"
+keycloak_helm_chart: "keycloak stable/keycloak"
+keycloak_directory: ""
+keycloak_hostpath: "/B13/KEYCLOAK/K8SDATA"
+keycloak_ingress_fqdn: "oidc.lab.byte13.org"
+keycloak_ingress_url: "https://raw.githubusercontent.com/keycloak/keycloak-quickstarts/latest/kubernetes-examples/keycloak-ingress.yaml"
+#
+### Kubernetes apiserver command line arguments to use an OIDC Provider (OP)
+#- --oidc-issuer-url={{ oidc_keycloak_url }}
+#- --oidc-client-id={{ oidc_clientid }}
+#- --oidc-username-claim={{ oidc_userclaim }}
+#- --oidc-username-prefix={{ oidc_userprefix }}
+#- --oidc-groups-claim={{ oidc_groupclaim }}
+#- --oidc-groups-prefix={{ oidc_groupprefix }}
+#- --oidc-required-claim={{ oidc_requiredclaims }}
+#- --oidc-ca-file={{ oidc_cafile }}
+#
+# End of common varibles
+######################################################
+######################################################
+# Rocky Linux (CentOS) specific
+#
+
+#
+# End of CentOS specific
+######################################################
+
+######################################################
+# Ubuntu specific
+#
+
+#
+# End of Ubuntu specific
+######################################################
+

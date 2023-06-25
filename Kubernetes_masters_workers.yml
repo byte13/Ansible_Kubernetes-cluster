@@ -1,0 +1,22 @@
+- hosts: k8smasternodes 
+  remote_user: user1
+  become: yes
+  become_method: sudo
+  become_user: root
+  roles: 
+    - dependencies
+    - cri-o
+    - k8s
+    - cni
+    - auditing
+#    - ingress
+- hosts: k8sworkernodes 
+  remote_user: user1
+  become: yes
+  become_method: sudo
+  become_user: root
+  roles: 
+  - dependencies
+  - cri-o
+  - k8s
+  - cni

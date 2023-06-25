@@ -1,0 +1,10 @@
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+podCIDR: {{ k8s_pods_subnet }}
+cgroupDriver: {{ k8s_cgroup_driver }}
+
+kind: ClusterConfiguration
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: {{ k8s_services_subnet }} 
+

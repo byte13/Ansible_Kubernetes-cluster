@@ -1,0 +1,13 @@
+---
+# handlers file for k8s 
+- name: reload firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
+    daemon_reload: yes
+
+- name: restart firewalld
+  systemd:
+    name: firewalld
+    state: restarted
+    daemon_reload: yes

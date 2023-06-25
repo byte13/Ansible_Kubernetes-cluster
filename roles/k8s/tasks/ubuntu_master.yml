@@ -1,0 +1,183 @@
+---
+# tasks file for k8s
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: k8s_display_facts == "yes"
+
+# selinux block requires to install a module using "ansible-galaxy collection install ansible.posix"
+- name: Set selinux to permissive mode during installation of the cluster
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+  when: ubuntu_selinux == "yes"
+
+#- name: Ensure selinux remains permissive accross reboots during initialization of Kubernetes 
+#  replace:
+#    path: /etc/sysconfig/selinux 
+#    regexp: '^([^#].*?\sSELINUX=enforcing\s+sw\s+.*)$'
+#    replace: 'SELINUX=permissive'
+#  when: ubuntu_selinux == "yes"
+
+- name: Disable memory swapping to disk since kubernetes can't work with swap enabled
+  shell: |
+    swapoff -a
+    # when: kubernetes_installed is changed
+
+- name: Disable memory swapping to disk in fstab since kubernetes can't work with swap enabled
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+  when: ansible_facts['os_family']|lower == 'ubuntu'
+
+# Set overlay and br_netfilter kernel modules to be loaded on system startup 
+- name: Set overlay and br_netfilter kernel modules to be loaded on system startup 
+  lineinfile:
+    dest: /etc/modules-load.d/crio.conf 
+    line: "{{ item }}"
+    state: present
+    create: yes
+    backup: yes
+  loop:
+    - overlay
+    - br_netfilter
+
+# Load overlay and br_netfilter kernel modules
+- name: Activate overlay and br_netfilter kernel modules 
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - overlay
+    - br_netfilter
+
+- name: "Add apt signing keys"
+  apt_key:
+    url: "{{ item }}"
+    state: present
+  loop:
+    - "{{ ubuntu_k8s_gpgkey1 }}"
+
+# Installation of kubeadm, kubelet and kubectl 
+- name: "Add Kubernetes {{ k8s_version }} apt repository"
+  apt_repository:
+    repo: "{{ ubuntu_k8s_repourl1 }}"
+    filename: "{{ ubuntu_k8s_repofilename1 }}"
+    mode: 0640
+    state: present
+    update_cache: yes
+
+- name: 'Install Kubernetes {{ k8s_version }} packages: {{ ubuntu_kubeadm_pkgname }}, {{ ubuntu_kubelet_pkgname }}, {{ ubuntu_kubectl_pkgname }}'
+  apt:
+    pkg: "{{ item }}"
+    state: present
+    update_cache: yes
+    autoremove: yes
+  loop:
+    - "{{ ubuntu_kubeadm_pkgname }}"
+    - "{{ ubuntu_kubelet_pkgname }}"
+    - "{{ ubuntu_kubectl_pkgname }}"
+  notify:
+    - enable kubelet 
+
+# Upload cluster and kubelet configuration file 
+- name: "Experimental - Upload cluster and kubelet configuration file"  
+  template:
+    src:   cluster-kubelet-config.j2
+    dest:  "{{ k8s_cluster_kubelet_configfile }}"
+    owner: root
+    group: root
+    mode:  0640
+
+# Upload kubelet arguments configuration file 
+- name: "Upload kubelet arguments configuration file"  
+  template:
+    src:   kubelet.j2
+    dest:  "{{ k8s_kubelet_extraargs_destfile }}"
+    owner: root
+    group: root
+    mode:  0640
+  notify:
+    - reload systemd
+
+# Initialize Kubernetes cluster using kubeadm
+- name: Reset cluster (set k8s_reset_cluster variable to "no" to not re-initialize the cluster)
+  command: kubeadm reset -f
+  when: k8s_reset_cluster == "yes"
+ 
+- name: Initialize Kubernetes cluster using kubeadm 
+  command: kubeadm init --pod-network-cidr={{ k8s_pods_subnet }} --service-cidr={{ k8s_services_subnet }}
+  #command: kubeadm init --config={{ k8s_cluster_kubelet_configfile }} 
+  when: (inventory_hostname in groups['k8smasternodes']) and (k8s_reset_cluster == "yes")
+
+# Copy kubeconfig in $HOME/.kube/config
+- name: Create ~{{ remote_user }}/.kube directory on target node
+  file:
+    path: ~{{ remote_user }}/.kube
+    state: directory
+    owner: "{{ remote_user }}"
+    mode: 0750
+
+- name: Copy /etc/kubernetes/admin.conf to ~{{ remote_user }}/.kube/config on target node 
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: ~{{ remote_user }}/.kube/config
+    remote_src: yes
+    backup: yes
+    owner: "{{ remote_user }}"
+    mode: 0600
+
+# Get token to join workers to the cluster 
+- name: Get token to join workers to the cluster
+  become: no
+  shell: kubeadm token create --print-join-command
+  register: kubernetes_join_worker_command
+  when: inventory_hostname in groups['k8smasternodes'] 
+
+#- debug:
+#  msg: "{{ kubernetes_join_worker_command.stdout }}"
+# Save join command for workers in local file
+- name: Save join command for workers in local {{ k8s_join_workers_dir }}/{{ inventory_hostname }}_{{ k8s_join_workers_file }}
+  become: no
+  local_action:
+    copy content="{{ kubernetes_join_worker_command.stdout_lines[0] }}" dest="{{ k8s_join_workers_dir }}/{{ inventory_hostname }}_{{ k8s_join_workers_file }}" mode=0600
+  when: inventory_hostname in groups['k8smasternodes'] 
+
+# Create soft link to join command file to be used later on worker nodes 
+- name: Create soft link to {{ k8s_join_workers_dir }}/{{ inventory_hostname }}_{{ k8s_join_workers_file }}
+  become: no
+  local_action:
+    command ln -s -f {{ inventory_hostname }}_{{ k8s_join_workers_file }} {{ k8s_join_workers_file }}
+  when: inventory_hostname in groups['k8smasternodes'] 
+
+# Retrieve kubeconfig file under {{ k8s_kubeconfig_dir }}
+- name: Retrieve kubeconfig file under {{ k8s_kubeconfig_dir }}. To manage the cluster, use kubectl --kubeconfig={{ inventory_hostname }}.conf ...
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ k8s_kubeconfig_dir }}/{{ inventory_hostname }}_admin.conf"
+    flat: yes
+    validate_checksum: yes
+    mode: 0600
+    backup: yes
+  when: inventory_hostname in groups['k8smasternodes'] 
+
+- name: "Restart kubelet" 
+  service:
+    name: kubelet 
+    state: restarted
+    enabled: yes
+
+#- name: set selinux to {{ ubuntu_selinux_mode }} mode
+#  ansible.posix.selinux:
+#    policy: targeted
+#    state: {{ ubuntu_selinux_mode }} 
+#  when: ubuntu_selinux == "yes"
+
+#- name: Ensure selinux remains enforcing accross reboots after initialization of Kubernetes on 
+#  replace:
+#  path: /etc/sysconfig/selinux 
+#  regexp: '^([^#].*?\sSELINUX=permissive\s+sw\s+.*)$'
+#  replace: 'SELINUX=enforcing'
+#  when: ubuntu_selinux == "yes"

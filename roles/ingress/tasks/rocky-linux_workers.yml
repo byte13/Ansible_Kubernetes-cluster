@@ -1,0 +1,28 @@
+---
+# tasks file for ingress
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: ingress_display_facts == "yes"
+
+##################
+# HAproxy specific
+##################
+
+- name: Set firewall rules for ingress trafics on CentOS/Redhat/Rock-Linux
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    # For Calico CNI
+    - 80/tcp
+    - 443/tcp
+    - 1024/tcp
+  notify:
+    - reload firewalld
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (inventory_hostname in groups['k8sworkernodes']) and (centos_ingress == "haproxy")
+

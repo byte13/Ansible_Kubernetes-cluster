@@ -1,0 +1,22 @@
+---
+# tasks file for k8s 
+# Import Linux distribution specific playbooks
+- name: Install ingress controller on RedHat 
+  import_tasks: rocky-linux_master.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes'])
+
+- name: Install ingress controller  on Rocky Linux 
+  import_tasks: rocky-linux_master.yml
+  when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8smasternodes'])
+
+- name: Install ingress controler on Debian 
+  import_tasks: ubuntu_master.yml
+  when: (ansible_facts['os_family']|lower == 'debian') and (inventory_hostname in groups['k8smasternodes'])
+
+- name: Set firewall for ingress controller on worker on RedHat 
+  import_tasks: rocky-linux_workers.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8sworkernodes'])
+
+- name: Set firewall for ingress controller on worker on Rocky Linux 
+  import_tasks: rocky-linux_workers.yml
+  when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8sworkernodes'])

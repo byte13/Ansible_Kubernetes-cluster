@@ -1,0 +1,81 @@
+---
+# tasks file for auditing
+# Create directory on target node to contain audit policy file 
+- name: Create {{ audit_apiserver_policydir }} directory on target node
+  file:
+    path: "{{ audit_apiserver_policydir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+# Create directory on target node to contain audit log files
+- name: Create {{ audit_apiserver_logdir }} directory on target node
+  file:
+    path: "{{ audit_apiserver_logdir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+# Set apiserver auditing policy file
+- name: Upload apiserver audit policy file 
+  template:
+    src: B13_K8S_Audit-Policy_simple.j2
+    dest:   "{{ audit_apiserver_policyfile }}"
+    owner: root
+    group: root
+    mode:  0640
+
+# Modify apiserver static pod manifest to add auditing
+- name: Modify {{ k8s_apiserver_manifest }} to add auditing
+  blockinfile:
+    marker_begin: "Begin marker -"
+    marker: "# {mark} Ansible edit : command line options for auditing"
+    marker_end: "End marker -"
+    #block: "{{ audit_apiserver_args }}"
+    block: |2
+          - --audit-policy-file={{ audit_apiserver_policyfile }}
+          - --audit-log-path={{ audit_apiserver_logfile }}
+          - --audit-log-maxage=1
+          - --audit-log-maxsize=20
+          - --audit-log-maxbackup=5
+    path: "{{ k8s_apiserver_manifest }}"
+    insertafter: '^[\s]*\- kube-apiserver[\s]*$'
+    backup: yes
+
+# Modify apiserver static pod manifest to add audit volume mount point 
+- name: Modify {{ k8s_apiserver_manifest }} to add audit volume mount point
+  blockinfile:
+    marker_begin: "Begin marker -"
+    marker: "# {mark} Ansible edit : MountPath for auditing"
+    marker_end: "End marker -"
+    #block: "{{ audit_apiserver_volumeMounts }}"
+    block: |2
+          - mountPath: {{ audit_apiserver_policyfile }}
+            name: b13-audit-policy
+            readOnly: true
+          - mountPath: {{ audit_apiserver_logfile }}
+            name: b13-audit-log
+            readOnly: false
+    path: "{{ k8s_apiserver_manifest }}"
+    insertafter: '^[\s]*volumeMounts\:[\s]*$'
+
+# Modify apiserver static pod manifest to add audit volume
+- name: Modify {{ k8s_apiserver_manifest }} to add audit volume
+  blockinfile:
+    marker_begin: "Begin marker -"
+    marker: "# {mark} Ansible edit : Volumes for auditing"
+    marker_end: "End marker -"
+    #block: "{{ audit_apiserver_volumes }}"
+    block: |2
+        - hostPath:
+            path: {{ audit_apiserver_policyfile }}
+            type: File
+          name: b13-audit-policy
+        - hostPath:
+            path: {{ audit_apiserver_logfile }}
+            type: FileOrCreate
+          name: b13-audit-log
+    path: "{{ k8s_apiserver_manifest }}"
+    insertafter: '^[\s]*volumes\:[\s]*$'

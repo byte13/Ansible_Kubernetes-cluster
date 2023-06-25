@@ -1,0 +1,41 @@
+---
+# tasks file for ingress
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: ingress_display_facts == "yes"
+
+##################
+# HAproxy specific
+##################
+
+- name: Set firewall rules for Keycloak trafics on CentOS/Redhat/Rock-Linux
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    # For Calico CNI
+    - 80/tcp
+    - 443/tcp
+    - 1024/tcp
+  notify:
+    - reload firewalld
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_ingress == "haproxy")
+
+- name: Add HAproxy controler Helm repository
+  become: no
+  shell: |
+    helm repo add {{ centos_haproxy_helm_repository }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
+
+- name: Install HAproxy controler using Helm chart 
+  become: no
+  shell: |
+    # By default, the ingress controller is installed using a Deployment resource. 
+    # To use a DaemonSet instead, set the controller.kind field to DaemonSet and controller.daemonset.useHostPort to true.
+    helm install {{ centos_haproxy_helm_chart }} --create-namespace --namespace {{ centos_haproxy_namespace }} --set controller.kind=DaemonSet --set controller.daemonset.useHostPort=true
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")

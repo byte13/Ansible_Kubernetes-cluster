@@ -1,0 +1,28 @@
+---
+# vars file for k8s HAproxy ingress controller 
+#
+######################################################
+# Common variables
+#
+# If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
+ingress_display_facts: "no"
+#
+# End of common varibles
+######################################################
+######################################################
+# CentOS specific
+#
+centos_ingress: "haproxy"
+centos_haproxy_helm_repository: "haproxytech https://haproxytech.github.io/helm-charts"
+centos_haproxy_helm_chart: "kubernetes-ingress haproxytech/kubernetes-ingress"
+centos_haproxy_namespace: "haproxy-controller"
+# End of CentOS specific
+######################################################
+
+######################################################
+# Ubuntu specific
+#
+#
+# End of Ubuntu specific
+######################################################
+

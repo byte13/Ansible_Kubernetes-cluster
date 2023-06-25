@@ -1,0 +1,22 @@
+---
+# tasks file to add OIDC authentication to apiserver 
+
+# Modify apiserver static pod manifest to add use an OIDC Provider (OP)
+- name: Modify {{ k8s_apiserver_manifest }} to use an OIDC Provider (OP) 
+  blockinfile:
+    marker_begin: "Begin marker -"
+    marker: "# {mark} Ansible edit : command line options for auditing"
+    marker_end: "End marker -"
+    #block: "{{ audit_apiserver_args }}"
+    block: |2
+          - --oidc-issuer-url={{ oidc_keycloak_url }}
+          - --oidc-client-id={{ oidc_clientid }}
+          #- --oidc-username-claim={{ oidc_userclaim }}
+          #- --oidc-username-prefix={{ oidc_userprefix }}
+          #- --oidc-groups-claim={{ oidc_groupclaim }}
+          #- --oidc-groups-prefix={{ oidc_groupprefix }}
+          #- --oidc-required-claim={{ oidc_requiredclaims }}
+    path: "{{ k8s_apiserver_manifest }}"
+    insertafter: '^[\s]*\- kube-apiserver[\s]*$'
+    backup: yes
+
