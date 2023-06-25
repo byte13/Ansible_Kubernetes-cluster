@@ -67,38 +67,45 @@
     - reload firewalld
   when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
 
-- name: Deploy Calico CNI operator on Centos, Redhat or Rocky-Linux 
+- name: Deploy Calico CNI on Centos, Redhat or Rocky-Linux 
   become: no
-  #shell: kubectl create -f {{centos_calico_url1 }} 
-  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url1 }} 
-  command: kubectl create -f {{ centos_calico_url1 }} 
+#  #shell: kubectl create -f {{centos_calico_url }} 
+#  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url }} 
+  command: kubectl create -f {{ centos_calico_url }} 
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
+
+#- name: Deploy Calico CNI with operator on Centos, Redhat or Rocky-Linux 
+#  become: no
+#  #shell: kubectl create -f {{centos_calico_url1 }} 
+#  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url1 }} 
+#  command: kubectl create -f {{ centos_calico_url1 }} 
+#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
 
 # Upload Calico CRD temporary file with proper pods subnet
-- name: "Upload CNI CRD definition file with proper pods subnet {{ calico_crd_tempfile }}"
-  become: yes
-  template:
-    src: calico_crd.j2 
-    dest: "{{ calico_crd_tempfile }}"
-    owner: root
-    group: root
-    mode: 0644
-    backup: no
+#- name: "Upload CNI CRD definition file with proper pods subnet {{ calico_crd_tempfile }}"
+#  become: yes
+#  template:
+#    src: calico_crd.j2 
+#    dest: "{{ calico_crd_tempfile }}"
+#    owner: root
+#    group: root
+#    mode: 0644
+#    backup: no
 
-- name: Deploy Calico CNI CRD's on Centos, Redhat or Rocky-Linux 
-  become: no
-  #shell: kubectl create -f {{centos_calico_url2 }} 
-  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url2 }} 
-  #command: kubectl create -f {{ centos_calico_url2 }} 
-  command: kubectl create -f {{ calico_crd_tempfile }} 
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
+#- name: Deploy Calico CNI CRD's on Centos, Redhat or Rocky-Linux 
+#  become: no
+#  #shell: kubectl create -f {{centos_calico_url2 }} 
+#  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url2 }} 
+#  #command: kubectl create -f {{ centos_calico_url2 }} 
+#  command: kubectl create -f {{ calico_crd_tempfile }} 
+#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
 
 # Remove temporary CRD definition file {{ calico_crd_tempfile }} from remote host"  
-- name: "Remove temporary CRD definition file {{ calico_crd_tempfile }} from remote host"
-  become: yes
-  file:
-    path: "{{ calico_crd_tempfile }}"
-    state: absent
+#- name: "Remove temporary CRD definition file {{ calico_crd_tempfile }} from remote host"
+#  become: yes
+#  file:
+#    path: "{{ calico_crd_tempfile }}"
+#    state: absent
 
 #################
 # Cilium specific
