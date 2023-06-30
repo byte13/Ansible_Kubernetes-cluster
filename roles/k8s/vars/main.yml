@@ -32,11 +32,11 @@ k8s_kubelet_extraargs: "--cgroup-driver=systemd --container-runtime-endpoint='un
 # Destination file to contain aforementioned arguments
 k8s_kubelet_extraargs_destfile: "/etc/default/kubelet"
 # Local directory and files containing the command to be run on worker nodes to join the cluster
-k8s_join_dir: "/B13/IAC/ANSIBLE/Kubernetes-cluster"
+k8s_join_dir: "/B13/IAC/ANSIBLE/Ansible_Kubernetes-cluster"
 #k8s_join_master_file: "k8s_masters_join.txt"
 k8s_join_worker_file: "k8s_workers_join.txt"
 # Local directory which will contain kubeconfig file to be used to connect to the cluster
-k8s_kubeconfig_dir: "/B13/IAC/ANSIBLE/Kubernetes-cluster"
+k8s_kubeconfig_dir: "/B13/IAC/ANSIBLE/Ansible_Kubernetes-cluster"
 #ansible_user: "user1" # Use become_user from hosts inventory file instead
 # Helm URL
 k8s_helm_URL: "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
