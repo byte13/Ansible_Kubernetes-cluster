@@ -9,7 +9,7 @@
 # Available version of Kubernetes and cri-o can be found using :
 # curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
 # https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:
-k8s_version: "1.24"
+k8s_version: "1.27"
 # To display the ansible facts while running the playbook, set the following variable to "yes"
 k8s_display_facts: "no"
 # To reset the cluster, set the following variable to "yes"
