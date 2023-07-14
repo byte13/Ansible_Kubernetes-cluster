@@ -9,9 +9,9 @@
 # Available version of Kubernetes and cri-o can be found using :
 # curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
 # https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:
-k8s_version: "1.24"
+k8s_version: "1.27"
 crio_version: "{{ k8s_version }}"
-crio_minorversion: "1.24.6"
+crio_minorversion: "1.27.0"
 # CRI-O pods subnet
 # Ensure chosen subnet doesn't conflict with enterprise subnet that pods should connect to.
 crio_pods_subnet: "10.100.0.0/16"
@@ -36,21 +36,21 @@ crio_bridge_configfile: "/etc/cni/net.d/100-crio-bridge.conf"
 centos_crio_osversion: "CentOS_8"
 #
 # CentOS containers libraries repository
-# See content of https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{centos_crio_version}}/devel:kubic:libcontainers:stable.repo
+# To find proper URL's, check https://cri-o.io/ 
+# Read respective .repo file and copy/paste URL's from there
 centos_crio_reponame1: "devel:kubic:libcontainers:stable"
-#centos_crio_repobaseurl1: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{centos_crio_osversion}}/devel:kubic:libcontainers:stable.repo"
-centos_crio_repobaseurl1: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{centos_crio_osversion}}"
-centos_crio_repogpgkey1: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{centos_crio_osversion}}/repodata/repomd.xml.key"
 centos_crio_repodesc1: "Stable Releases of Upstream github.com/containers packages ({{centos_crio_osversion}})"
+centos_crio_repobaseurl1: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/{{centos_crio_osversion}}/"
+centos_crio_repogpgkey1: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{centos_crio_osversion}}/repodata/repomd.xml.key"
 #
 # CRI-O repository for CentOS
-# See content of https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{crio_version}}/{{centos_crio_version}}/devel:kubic:libcontainers:stable:cri-o:{{crio_version}}.repo
-centos_crio_reponame2: "devel:kubic:libcontainers:stable:cri-o:{{crio_version}}"
-#centos_crio_repobaseurl2: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{crio_version}}/{{centos_crio_osversion}}/devel:kubic:libcontainers:stable:cri-o:{{crio_version}}.repo"
-centos_crio_repobaseurl2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}:/{{crio_minorversion}}/{{centos_crio_osversion}}"
-#centos_crio_repogpgkey2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/repodata/repomd.xml.key"
-centos_crio_repogpgkey2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}:/{{crio_minorversion}}/{{centos_crio_osversion}}/repodata/repomd.xml.key"
+# To find proper URL's, check https://cri-o.io/ 
+# Read respective .repo file and copy/paste URL's from there
+#centos_crio_reponame2: "devel:kubic:libcontainers:stable:cri-o:{{crio_version}}"
+centos_crio_reponame2: "devel:kubic:libcontainers:stable:cri-o"
 centos_crio_repodesc2: "devel:kubic:libcontainers:stable:cri-o:{{crio_version}} ({{centos_crio_osversion}})"
+centos_crio_repobaseurl2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/"
+centos_crio_repogpgkey2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}:/{{centos_crio_osversion}}/repodata/repomd.xml.key"
 #centos_crio_pkgname: "cri-o-{{crio_version}}"
 centos_crio_pkgname: "cri-o"
 centos_criotools_pkgname: "cri-tools"

@@ -24,6 +24,19 @@
 - name: Apply new settings
   command: sysctl --system
 
+- name: "Get list of old libcontainer repositories files" 
+  find:
+    paths: /etc/yum.repos.d
+    patterns: "devel:kubic:libcontainers*"
+    #patterns: '^devel:kubic:libcontainers:+$'
+  register: find_results
+
+- name: "Remove old libcontainer repositories" 
+  file:
+    path: "{{ item['path'] }}"
+    state: absent
+  with_items: "{{ find_results['files'] }}"
+
 - name: Add containers libraries repository from {{ centos_crio_repobaseurl1 }}
   yum_repository:
     name: "{{ centos_crio_reponame1 }}"

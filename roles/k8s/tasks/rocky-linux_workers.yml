@@ -74,14 +74,9 @@
     - overlay
     - br_netfilter
 
-# Installation of tc, net-tools, kubeadm, kubelet and kubectl 
-- name: "Add Kubernetes {{ k8s_version }} Kubernetes yum repository"
-  yum_repository:
-    name: "{{ centos_k8s_reponame1 }}"
-    description: "{{ centos_k8s_repodesc1 }}" 
-    baseurl: "{{ centos_k8s_repobaseurl1 }}"
-    gpgcheck: yes
-    gpgkey: "{{ centos_k8s_repogpgkey1 }}"
+- name: "Reset cluster (set k8s_reset_cluster variable to 'no' to not re-initialize the cluster)"
+  command: kubeadm reset -f
+  when: k8s_reset_cluster == "yes"
 
 - name: "Stop kubelet"
   systemd:
@@ -105,6 +100,15 @@
     state: absent
   when: k8s_reset_cluster == "yes"
 
+# Installation of tc, net-tools, kubeadm, kubelet and kubectl 
+- name: "Add Kubernetes {{ k8s_version }} Kubernetes yum repository"
+  yum_repository:
+    name: "{{ centos_k8s_reponame1 }}"
+    description: "{{ centos_k8s_repodesc1 }}" 
+    baseurl: "{{ centos_k8s_repobaseurl1 }}"
+    gpgcheck: yes
+    gpgkey: "{{ centos_k8s_repogpgkey1 }}"
+
 - name: "Install tools and Kubernetes packages: {{ centos_tc_pkgname }}, {{ centos_nettools_pkgname }}, {{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}, {{ centos_kubectl_pkgname }}"
   dnf:
     name:
@@ -126,10 +130,6 @@
     owner: root
     group: root
     mode:  0640
-
-- name: "Reset cluster (set k8s_reset_cluster variable to 'no' to not re-initialize the cluster)"
-  command: kubeadm reset -f
-  when: k8s_reset_cluster == "yes"
 
 # Upload kubelet arguments configuration file 
 - name: "Upload kubelet arguments configuration file"
