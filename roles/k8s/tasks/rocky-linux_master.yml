@@ -79,11 +79,6 @@
     - overlay
     - br_netfilter
 
-# Initialize Kubernetes cluster using kubeadm
-- name: "Reset cluster (set k8s_reset_cluster variable to 'no' to not re-initialize the cluster)"
-  command: kubeadm reset -f
-  when: k8s_reset_cluster == "yes"
-
 - name: "Stop kubelet"
   systemd:
     name: kubelet
@@ -128,6 +123,11 @@
     update_cache: yes
   notify:
     - enable kubelet 
+
+# Initialize Kubernetes cluster using kubeadm
+- name: "Reset cluster (set k8s_reset_cluster variable to 'no' to not re-initialize the cluster)"
+  command: kubeadm reset -f
+  when: k8s_reset_cluster == "yes"
 
 # Upload kubelet configuration file 
 - name: "Experimental - Upload kubelet configuration file"
