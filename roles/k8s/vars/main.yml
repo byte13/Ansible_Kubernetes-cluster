@@ -14,12 +14,14 @@ k8s_version: "1.27"
 k8s_display_facts: "no"
 # To reset the cluster, set the following variable to "yes"
 k8s_reset_cluster: "yes"
+# K8S apiserver IP address
+k8s_apiserver_advip: "10.13.4.1"
 # Kubernetes pods subnet
 # Ensure that the specified range doesn't overlap with other enterprise subnets so that no routing ambiguity exists in the pods.
 k8s_pods_subnet: "10.100.0.0/16"
 # Kubernetes services subnet
 # Ensure that the specified range doesn't overlap with other enterprise subnets so that no routing ambiguity exists in the pods.
-k8s_services_subnet: "10.200.0.0/16"
+k8s_services_subnet: "10.150.0.0/16"
 # Parameters to set in Kubelet config file instead of passing them as deprecated command line arguments
 k8s_cluster_kubelet_configfile: "/etc/kubernetes/cluster-kubelet-config.yaml"
 k8s_cgroup_driver: "systemd"

@@ -29,7 +29,7 @@
   loop:
     - 10250/tcp
     - 30000-32767/tcp
-  when: inventory_hostname in groups['k8sworkernodes'] 
+  when: (inventory_hostname in groups['k8sworkernodes']) and (centos_cni != 'calico') 
   notify:
     - reload firewalld
 

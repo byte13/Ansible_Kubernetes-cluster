@@ -9,13 +9,13 @@
 #################
 # Calico specific
 #################
-- name: Set firewalld trusted zone as the default zone
-  become: yes
-  shell: |
-    firewall-cmd --set-default-zone trusted
-  notify:
-    - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#- name: Set firewalld trusted zone as the default zone
+#  become: yes
+#  shell: |
+#    firewall-cmd --set-default-zone trusted
+#  notify:
+#    - reload firewalld
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
 
 #- name: Set interface {{ centos_host_interface }} in public firewall zone on CentOS/Redhat/Rock-Linux
 #  firewalld:
@@ -28,46 +28,67 @@
 #    - reload firewalld
 #  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
 
-- name: Set interface {{ centos_host_interface }} in public firewall zone on CentOS/Redhat/Rock-Linux
-  become: yes
-  shell: |
-    firewall-cmd --zone=public --add-interface={{ centos_host_interface }} --permanent
-  notify:
-    - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#- name: Set interface {{ centos_host_interface }} in public firewall zone on CentOS/Redhat/Rock-Linux
+#  become: yes
+#  shell: |
+#    firewall-cmd --zone=public --add-interface={{ centos_host_interface }} --permanent
+#  notify:
+#    - reload firewalld
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
 
-- name: Set firewall masquerade in public firewalld zone on CentOS/Redhat/Rock-Linux
-  firewalld:
-    zone: public
-    masquerade: yes
-    state: enabled
-    permanent: yes
-    immediate: yes
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#- name: Set firewall masquerade in public firewalld zone on CentOS/Redhat/Rock-Linux
+#  firewalld:
+#    zone: public
+#    masquerade: yes
+#    state: enabled
+#    permanent: yes
+#    immediate: yes
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
 
-- name: Set firewall rules for Calico CNI to allow BGP on CentOS/Redhat/Rock-Linux
-  firewalld:
-    zone: public
-    port: "{{ item }}"
-    permanent: yes
-    immediate: yes
-    state: enabled
-  loop:
-    # For Calico CNI
-    - 179/tcp
-  notify:
-    - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#- name: Set firewall rules for Calico CNI to allow BGP on CentOS/Redhat/Rock-Linux
+#  firewalld:
+#    zone: public
+#    port: "{{ item }}"
+#    permanent: yes
+#    immediate: yes
+#    state: enabled
+#  loop:
+#    # For Calico CNI
+#    - 179/tcp
+#  notify:
+#    - reload firewalld
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
 
 # Next rule required if Calico ipipMode is set to "Always".
 # Not required if ipipMode is set to "CrossSubnet" and all nodes are in same subnet
-- name: Set firewall rules for Calico CNI to allow protocol 4 (IPinIP tunnel) on CentOS/Redhat/Rock-Linux
-  shell: /bin/firewall-cmd --permanent --add-protocol=4 --zone public
-  notify:
-    - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#- name: Set firewall rules for Calico CNI to allow protocol 4 (IPinIP tunnel) on CentOS/Redhat/Rock-Linux
+#  shell: /bin/firewall-cmd --permanent --add-protocol=4 --zone public
+#  notify:
+#    - reload firewalld
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
 
-- name: Deploy Calico CNI on Centos, Redhat or Rocky-Linux 
+# Ensure NetworkManager doesn't manage Calico interfaces
+# Reference : https://docs.tigera.io/calico/latest/operations/troubleshoot/troubleshooting#configure-networkmanager
+- name: Ensure NetworkManager doesn't interfere with Calico interfaces - Upload {{ centos_calico_netmgr_configfile }}
+  template:
+    src:   calico.conf.j2
+    dest:  "{{ centos_calico_netmgr_configfile }}"
+    owner: root
+    group: root
+    mode:  0640
+  notify:
+    - restart NetworkManager
+
+# Stop and disable firewalld; use Calico to manage IP filtering on Kubernetes nodes interfaces
+# References: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements
+#             https://docs.tigera.io/calico/latest/network-policy/hosts
+- name: Stop and disable firewalld; use Calico to manage IP filtering on Kubernetes nodes interfaces 
+  ansible.builtin.service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Deploy Calico CNI without Tigera operator on Centos, Redhat or Rocky-Linux 
   become: no
 #  #shell: kubectl create -f {{centos_calico_url }} 
 #  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url }} 
@@ -80,6 +101,18 @@
 #  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url1 }} 
 #  command: kubectl create -f {{ centos_calico_url1 }} 
 #  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
+#    backup: no
+
+# Upload Calico IPPool temporary file with proper pods subnetting
+#- name: Upload Calico CNI IPpool definition file with proper pods subnet sunbnetting - {{ calico_ippools_tempfile }}
+#  become: yes
+#  template:
+#    src: calico_ippools.j2 
+#    dest: "{{ calico_ippools_tempfile }}"
+#    owner: root
+#    group: root
+#    mode: 0640
+#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
 
 # Upload Calico CRD temporary file with proper pods subnet
 #- name: "Upload CNI CRD definition file with proper pods subnet {{ calico_crd_tempfile }}"
@@ -89,8 +122,14 @@
 #    dest: "{{ calico_crd_tempfile }}"
 #    owner: root
 #    group: root
-#    mode: 0644
-#    backup: no
+#    mode: 0640
+
+# Remove temporary CRD definition file {{ calico_crd_tempfile }} from remote host"  
+#- name: "Remove temporary CRD definition file {{ calico_crd_tempfile }} from remote host"
+#  become: yes
+#  file:
+#    path: "{{ calico_crd_tempfile }}"
+#    state: absent
 
 #- name: Deploy Calico CNI CRD's on Centos, Redhat or Rocky-Linux 
 #  become: no
@@ -99,13 +138,6 @@
 #  #command: kubectl create -f {{ centos_calico_url2 }} 
 #  command: kubectl create -f {{ calico_crd_tempfile }} 
 #  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
-
-# Remove temporary CRD definition file {{ calico_crd_tempfile }} from remote host"  
-#- name: "Remove temporary CRD definition file {{ calico_crd_tempfile }} from remote host"
-#  become: yes
-#  file:
-#    path: "{{ calico_crd_tempfile }}"
-#    state: absent
 
 #################
 # Cilium specific

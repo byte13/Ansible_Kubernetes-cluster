@@ -11,3 +11,9 @@
     name: firewalld
     state: restarted
     daemon_reload: yes
+
+- name: restart NetworkManager
+  systemd:
+    name: NetworkManager 
+    state: restarted
+    daemon_reload: yes

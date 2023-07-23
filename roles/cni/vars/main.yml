@@ -11,7 +11,8 @@ cni_display_facts: "no"
 k8s_pods_subnet: "10.100.0.0/16"
 k8s_pods_subnetmask: "24"
 calico_version: "v3.26.1"
-calico_crd_tempfile: "/tmp/calico_crd_tempfile.yml"
+calico_crd_tempfile: "/tmp/calico_crd.yml"
+calico_ippools_tempfile: "/tmp/calico_ippools.yaml"
 cilium_helm_repository: "https://helm.cilium.io/"
 cilium_helm_chart: "cilium/cilium"
 cilium_version: "1.11.4"
@@ -29,12 +30,13 @@ centos_cni: calico
 # URL for CNI
 centos_antrea_url: "https://raw.githubusercontent.com/antrea-io/antrea/main/build/yamls/antrea.yml"
 # Without operator - check https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
-centos_calico_url: "https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml"
+centos_calico_url: "https://raw.githubusercontent.com/projectcalico/calico/{{calico_version}}/manifests/calico.yaml"
 # With operator - check https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
 centos_calico_url1: "https://raw.githubusercontent.com/projectcalico/calico/{{calico_version}}/manifests/tigera-operator.yaml"
 centos_calico_url2: "https://raw.githubusercontent.com/projectcalico/calico/{{calico_version}}/manifests/custom-resources.yaml"
 centos_weave_url: "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 centos_host_interface: enp0s3
+centos_calico_netmgr_configfile: "/etc/NetworkManager/conf.d/calico.conf"
 #
 # End of CentOS specific
 ######################################################

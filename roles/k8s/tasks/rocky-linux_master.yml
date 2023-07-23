@@ -34,7 +34,7 @@
     - 10251/tcp
     - 10252/tcp
     - 10255/tcp
-  when: inventory_hostname in groups['k8smasternodes'] 
+  when: (inventory_hostname in groups['k8smasternodes']) and  (centos_cni != 'calico')
   notify:
     - restart firewalld
 
@@ -130,13 +130,13 @@
   when: k8s_reset_cluster == "yes"
 
 # Upload kubelet configuration file 
-- name: "Experimental - Upload kubelet configuration file"
-  template:
-    src:   cluster-kubelet-config.j2
-    dest:  "{{ k8s_cluster_kubelet_configfile }}"
-    owner: root
-    group: root
-    mode:  0640
+#- name: "Experimental - Upload kubelet configuration file"
+#  template:
+#    src:   cluster-kubelet-config.j2
+#    dest:  "{{ k8s_cluster_kubelet_configfile }}"
+#    owner: root
+#    group: root
+#    mode:  0640
 
 # Upload kubelet arguments configuration file 
 - name: "Upload kubelet arguments configuration file"
@@ -150,7 +150,9 @@
     - reload systemd
  
 - name: Initialize Kubernetes cluster using kubeadm 
-  command: kubeadm init --pod-network-cidr={{ k8s_pods_subnet }} --service-cidr={{ k8s_services_subnet }}
+  command: kubeadm init --apiserver-advertise-address={{ k8s_apiserver_advip }} \
+                        --service-cidr={{ k8s_services_subnet }} \
+                        --pod-network-cidr={{ k8s_pods_subnet }}
   #command: kubeadm init --config={{ k8s_cluster_kubelet_configfile }}
   when: (inventory_hostname in groups['k8smasternodes']) and (k8s_reset_cluster == "yes")
 
