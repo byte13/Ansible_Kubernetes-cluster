@@ -1,6 +1,5 @@
 all:
   hosts:
-    gaga.com:
   children:
      centos:
       children:

@@ -66,6 +66,32 @@
   notify:
     - enable crio
 
+# Configure CRI-O system startup environment file to add proxy variables
+# If required, set proxy environment variables in /etc/sysconfig/crio 
+- name: Set proxy in /etc/sysconfig/crio 
+  ansible.builtin.blockinfile:
+    path: "{{ centos_crio_envfile }}" 
+    create: "true"
+    marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
+    marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
+    block: |
+      Environment="http_proxy={{ crio_http_proxy }}"
+      Environment="https_proxy={{ crio_https_proxy }}" 
+      Environment="no_proxy={{ crio_no_proxy }}"
+      Environment="HTTP_PROXY={{ crio_http_proxy }}"
+      Environment="HTTPS_PROXY={{ crio_https_proxy }}" 
+      Environment="NO_PROXY={{ crio_no_proxy }}"
+  when: dependencies_proxy_required == "yes"
+
+# Possibly, remove proxy environment variables in /etc/sysconfig/crio 
+- name: No proxy required - Remove proxy variable from /etc/sysconfig/crio 
+  ansible.builtin.blockinfile:
+    path: /etc/sysconfig/crio 
+    marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
+    marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
+    block: "" 
+  when: dependencies_proxy_required != "yes"
+
 # Upload registries configuration file
 - name: "Upload registries configuration file"  
   template:
@@ -86,15 +112,22 @@
     mode:  0640
     backup: yes
 
+# Remove possible CRI-O bridge configuration file
+- name: Remove possible CRI-O bridge configuration file {{ crio_bridge_configfile }}
+  file:
+    path: "{{ crio_bridge_configfile }}"
+    state: absent
+
 # Upload CRI-O bridge configuration file
-- name: "Upload CRI-O bridge configuration file {{ crio_bridge_configfile }}"  
-  template:
-    src: 100-crio-bridge.conf.j2
-    dest: "{{ crio_bridge_configfile }}"
-    owner: root
-    group: root
-    mode: 0640
-    backup: yes
+#- name: "Upload CRI-O bridge configuration file {{ crio_bridge_configfile }}"  
+#  template:
+#    src: 100-crio-bridge.conf.j2
+#    dest: "{{ crio_bridge_configfile }}"
+#    owner: root
+#    group: root
+#    mode: 0640
+#    backup: yes
+#  when: centos_cni != 'calico'
 
 - name: "Restart CRI-O" 
   systemd:

@@ -34,7 +34,7 @@
     - 10251/tcp
     - 10252/tcp
     - 10255/tcp
-  when: (inventory_hostname in groups['k8smasternodes']) and  (centos_cni != 'calico')
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni != 'calico')
   notify:
     - restart firewalld
 
