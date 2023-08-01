@@ -6,6 +6,16 @@
     var: ansible_facts
   when: dependencies_display_facts == "yes"
 
+# Possibly remove proxy environment variables from /etc/environment 
+# To check what programs leverage /etc/environment, run grep -l pam_env /etc/pam.d/* on target host
+- name: No proxy required - Remove possible proxy variables from /etc/environment
+  ansible.builtin.blockinfile:
+    path: /etc/environment
+    marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
+    marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
+    block: "" 
+  #when: dependencies_proxy_required != "yes" 
+
 # If required, set proxy global environment variables in /etc/environment 
 # To check what programs leverage /etc/environment, run grep -l pam_env /etc/pam.d/* on target host
 - name: Proxy required - Set proxy global environment variables in /etc/environment
@@ -22,15 +32,13 @@
       NO_PROXY="{{ dependencies_no_proxy }}"
   when: dependencies_proxy_required == "yes" 
 
-# Possibly remove proxy environment variables from /etc/environment 
-# To check what programs leverage /etc/environment, run grep -l pam_env /etc/pam.d/* on target host
-- name: No proxy required - Remove possible proxy variables from /etc/environment
-  ansible.builtin.blockinfile:
-    path: /etc/environment
-    marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
-    marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
-    block: "" 
-  when: dependencies_proxy_required != "yes" 
+# Possibly delete /etc/profile.d/http_proxy.sh
+# For programs started in a shell interpreter (typically bash, sh) 
+- name: No proxy required - Remove {{ dependencies_proxy_profile }} 
+  ansible.builtin.file:
+    path: "{{ dependencies_proxy_profile }}" 
+    state: absent
+  #when: dependencies_proxy_required != "yes" 
 
 # If required, set proxy global environment variables in /etc/profile.d/http_proxy.sh
 # For programs started in a shell interpreter (typically bash, sh) 
@@ -49,13 +57,15 @@
       export NO_PROXY="{{ dependencies_no_proxy }}"
   when: dependencies_proxy_required == "yes" 
 
-# Possibly delete /etc/profile.d/http_proxy.sh
-# For programs started in a shell interpreter (typically bash, sh) 
-- name: No proxy required - Remove {{ dependencies_proxy_profile }} 
-  ansible.builtin.file:
-    path: "{{ dependencies_proxy_profile }}"
-    state: absent
-  when: dependencies_proxy_required != "yes" 
+# Possibly remove proxy in /etc/dnf/dnf.conf
+- name: No proxy required - Remove possible proxy from /etc/dnf/dnf.conf 
+  ansible.builtin.blockinfile:
+    path: /etc/dnf/dnf.conf 
+    backup: yes
+    marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
+    marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
+    block: "" 
+  #when: dependencies_proxy_required != "yes" 
 
 # If required, set proxy in /etc/dnf/dnf.conf
 - name: Proxy required - Set proxy in /etc/dnf/dnf.conf 
@@ -68,20 +78,9 @@
       proxy="{{ dependencies_http_proxy }}"
   when: dependencies_proxy_required == "yes" 
 
-# Possibly remove proxy in /etc/dnf/dnf.conf
-- name: No proxy required - Remove possible proxy from /etc/dnf/dnf.conf 
-  ansible.builtin.blockinfile:
-    path: /etc/dnf/dnf.conf 
-    backup: yes
-    marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
-    marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
-    block: "" 
-  when: dependencies_proxy_required != "yes" 
-
 - name: Install the latest version of curl
   become: yes
   dnf:
     name: curl
     state: latest
   when: inventory_hostname in groups['k8smasternodes']
-
