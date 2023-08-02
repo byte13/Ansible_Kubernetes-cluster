@@ -4,7 +4,7 @@
 - name: Show facts available on the system
   ansible.builtin.debug:
     var: ansible_facts
-  when: dependencies_display_facts == "yes"
+  when: global_display_facts == "yes"
 
 # Possibly remove proxy environment variables from /etc/environment 
 # To check what programs leverage /etc/environment, run grep -l pam_env /etc/pam.d/* on target host
@@ -14,7 +14,7 @@
     marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: "" 
-  #when: dependencies_proxy_required != "yes" 
+  #when: global_proxy_required != "yes" 
 
 # If required, set proxy global environment variables in /etc/environment 
 # To check what programs leverage /etc/environment, run grep -l pam_env /etc/pam.d/* on target host
@@ -24,38 +24,38 @@
     marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: |
-      http_proxy="{{ dependencies_http_proxy }}"
-      https_proxy="{{ dependencies_https_proxy }}" 
-      no_proxy="{{ dependencies_no_proxy }}"
-      HTTP_PROXY="{{ dependencies_http_proxy }}"
-      HTTPS_PROXY="{{ dependencies_https_proxy }}" 
-      NO_PROXY="{{ dependencies_no_proxy }}"
-  when: dependencies_proxy_required == "yes" 
+      http_proxy="{{ global_http_proxy }}"
+      https_proxy="{{ global_https_proxy }}" 
+      no_proxy="{{ global_no_proxy }}"
+      HTTP_PROXY="{{ global_http_proxy }}"
+      HTTPS_PROXY="{{ global_https_proxy }}" 
+      NO_PROXY="{{ global_no_proxy }}"
+  when: global_proxy_required == "yes" 
 
 # Possibly delete /etc/profile.d/http_proxy.sh
 # For programs started in a shell interpreter (typically bash, sh) 
-- name: No proxy required - Remove {{ dependencies_proxy_profile }} 
+- name: No proxy required - Remove {{ global_proxy_profile }} 
   ansible.builtin.file:
-    path: "{{ dependencies_proxy_profile }}" 
+    path: "{{ global_proxy_profile }}" 
     state: absent
-  #when: dependencies_proxy_required != "yes" 
+  #when: global_proxy_required != "yes" 
 
 # If required, set proxy global environment variables in /etc/profile.d/http_proxy.sh
 # For programs started in a shell interpreter (typically bash, sh) 
-- name: Proxy required - Set proxy global environment variables in {{ dependencies_proxy_profile }} 
+- name: Proxy required - Set proxy global environment variables in {{ global_proxy_profile }} 
   ansible.builtin.blockinfile:
-    path: "{{ dependencies_proxy_profile }}" 
+    path: "{{ global_proxy_profile }}" 
     create: "true"
     marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: |
-      export http_proxy="{{ dependencies_http_proxy }}"
-      export https_proxy="{{ dependencies_https_proxy }}"
-      export no_proxy="{{ dependencies_no_proxy }}"
-      export HTTP_PROXY="{{ dependencies_http_proxy }}"
-      export HTTPS_PROXY="{{ dependencies_https_proxy }}"
-      export NO_PROXY="{{ dependencies_no_proxy }}"
-  when: dependencies_proxy_required == "yes" 
+      export http_proxy="{{ global_http_proxy }}"
+      export https_proxy="{{ global_https_proxy }}"
+      export no_proxy="{{ global_no_proxy }}"
+      export HTTP_PROXY="{{ global_http_proxy }}"
+      export HTTPS_PROXY="{{ global_https_proxy }}"
+      export NO_PROXY="{{ global_no_proxy }}"
+  when: global_proxy_required == "yes" 
 
 # Possibly remove proxy in /etc/dnf/dnf.conf
 - name: No proxy required - Remove possible proxy from /etc/dnf/dnf.conf 
@@ -65,7 +65,7 @@
     marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: "" 
-  #when: dependencies_proxy_required != "yes" 
+  #when: global_proxy_required != "yes" 
 
 # If required, set proxy in /etc/dnf/dnf.conf
 - name: Proxy required - Set proxy in /etc/dnf/dnf.conf 
@@ -75,8 +75,15 @@
     marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: |
-      proxy="{{ dependencies_http_proxy }}"
-  when: dependencies_proxy_required == "yes" 
+      proxy="{{ global_http_proxy }}"
+  when: global_proxy_required == "yes" 
+
+- name: Possible install updates using dnf on {{ ansible_facts['os_family'] }}
+  dnf:
+    name: "*"
+    state: latest
+    exclude: kubelet
+  when: global_upgrade_node == "yes"
 
 - name: Install the latest version of curl
   become: yes
@@ -96,7 +103,7 @@
     http_proxy: 'http://10.13.4.254:3128'
     https_proxy: 'http://10.13.4.254:3128'
   register: retval 
-  when: dependencies_proxy_required == "yes"
+  when: global_proxy_required == "yes"
 
 #- name: "Display returned value"
 #  debug:
@@ -115,7 +122,7 @@
     force: "yes"
     mode: '0700'
   register: retval 
-  when: dependencies_proxy_required != "yes"
+  when: global_proxy_required != "yes"
 
 - name: "Run script to install Helm without proxy, then remove script"
   shell: |

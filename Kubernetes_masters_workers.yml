@@ -3,6 +3,19 @@
   become: yes
   become_method: sudo
   become_user: root
+
+  vars:
+    global_display_facts:  "no"
+    global_upgrade_node:   "no"
+    global_cni:            "calico"
+    global_proxy_required: "yes"
+    global_proxy_profile:  "/etc/profile.d/http_proxy.sh"
+    global_proxy_ip:       "10.13.4.254"
+    global_proxy_port:     "3128"
+    global_http_proxy:     "http://{{global_proxy_ip}}:{{global_proxy_port}}"
+    global_https_proxy:    "http://{{global_proxy_ip}}:{{global_proxy_port}}"
+    global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" 
+
   roles: 
     - dependencies
     - cri-o
@@ -15,6 +28,19 @@
   become: yes
   become_method: sudo
   become_user: root
+
+  vars:
+    global_display_facts:  "no"
+    global_upgrade_node:   "no"
+    global_cni:            "calico"
+    global_proxy_required: "yes"
+    global_proxy_profile:  "/etc/profile.d/http_proxy.sh"
+    global_proxy_ip:       "10.13.4.254"
+    global_proxy_port:     "3128"
+    global_http_proxy:     "http://{{global_proxy_ip}}:{{global_proxy_port}}"
+    global_https_proxy:    "http://{{global_proxy_ip}}:{{global_proxy_port}}"
+    global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" 
+
   roles: 
   - dependencies
   - cri-o

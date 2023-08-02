@@ -15,7 +15,7 @@
 #    firewall-cmd --set-default-zone trusted
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 #- name: Set interface {{ centos_host_interface }} in public firewall zone on CentOS/Redhat/Rock-Linux
 #  firewalld:
@@ -26,7 +26,7 @@
 #    state: enabled
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 #- name: Set interface {{ centos_host_interface }} in public firewall zone on CentOS/Redhat/Rock-Linux
 #  become: yes
@@ -34,7 +34,7 @@
 #    firewall-cmd --zone=public --add-interface={{ centos_host_interface }} --permanent
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 #- name: Set firewall masquerade in public firewalld zone on CentOS/Redhat/Rock-Linux
 #  firewalld:
@@ -43,7 +43,7 @@
 #    state: enabled
 #    permanent: yes
 #    immediate: yes
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 #- name: Set firewall rules for Calico CNI to allow BGP on CentOS/Redhat/Rock-Linux
 #  firewalld:
@@ -57,7 +57,7 @@
 #    - 179/tcp
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 # Next rule required if Calico ipipMode is set to "Always".
 # Not required if ipipMode is set to "CrossSubnet" and all nodes are in same subnet
@@ -65,7 +65,7 @@
 #  shell: /bin/firewall-cmd --permanent --add-protocol=4 --zone public
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 # Ensure NetworkManager doesn't manage Calico interfaces
 # Reference : https://docs.tigera.io/calico/latest/operations/troubleshoot/troubleshooting#configure-networkmanager
@@ -93,14 +93,14 @@
 #  #shell: kubectl create -f {{centos_calico_url }} 
 #  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url }} 
   command: kubectl create -f {{ centos_calico_url }} 
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "calico")
 
 #- name: Deploy Calico CNI with operator on Centos, Redhat or Rocky-Linux 
 #  become: no
 #  #shell: kubectl create -f {{centos_calico_url1 }} 
 #  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url1 }} 
 #  command: kubectl create -f {{ centos_calico_url1 }} 
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "calico")
 #    backup: no
 
 # Upload Calico IPPool temporary file with proper pods subnetting
@@ -112,7 +112,7 @@
 #    owner: root
 #    group: root
 #    mode: 0640
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "calico")
 
 # Upload Calico CRD temporary file with proper pods subnet
 #- name: "Upload CNI CRD definition file with proper pods subnet {{ calico_crd_tempfile }}"
@@ -137,7 +137,7 @@
 #  #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config create -f {{ centos_calico_url2 }} 
 #  #command: kubectl create -f {{ centos_calico_url2 }} 
 #  command: kubectl create -f {{ calico_crd_tempfile }} 
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "calico")
 
 #################
 # Cilium specific
@@ -148,7 +148,7 @@
 #    firewall-cmd --set-default-zone trusted
 #  notify:
 #    - reload firewalld
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 #
 #- name: Set interface "{{ centos_host_interface }}" in public firewall zone on CentOS/Redhat/Rock-Linux
 #  firewalld:
@@ -159,7 +159,7 @@
 #    state: enabled
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "cilium")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "cilium")
 
 - name: Set firewall masquerade in public firewalld zone on CentOS/Redhat/Rock-Linux
   firewalld:
@@ -168,7 +168,7 @@
     state: enabled
     permanent: yes
     immediate: yes
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "cilium")
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "cilium")
 
 - name: Set firewall rules for Cilium CNI to allow Hubble, healthchecks and VXLAN on CentOS/Redhat/Rock-Linux
   firewalld:
@@ -184,7 +184,7 @@
     - 12000/tcp 
   notify:
     - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "cilium")
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "cilium")
 
 - name: Install Cilium cLi
   become: yes
@@ -193,7 +193,7 @@
     sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
     tar xzvfC cilium-linux-amd64.tar.gz /usr/local/bin
     rm cilium-linux-amd64.tar.gz{,.sha256sum}
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 - name: Install Hubble CLI
   become: yes
@@ -203,19 +203,19 @@
     sha256sum --check hubble-linux-amd64.tar.gz.sha256sum
     tar xzvfC hubble-linux-amd64.tar.gz /usr/local/bin
     rm hubble-linux-amd64.tar.gz{,.sha256sum}
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium") and (cilium_activate_hubble == "yes")
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium") and (cilium_activate_hubble == "yes")
 
 #- name: Install Cilium cNi using Cilium CLI 
 #  become: no
 #  shell: |
 #    cilium install
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 #- name: Enable Hubble observatory in Cilium using Cilium CLI
 #  become: no
 #  shell: |
 #    cilium hubble enable
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium") and (cilium_activate_hubble == "yes")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium") and (cilium_activate_hubble == "yes")
 
 # Next one fails because using "become: yes", command -v helm fails (tried with sudo command - v helm)
 # while helm is available in /usr/local/bin
@@ -225,32 +225,32 @@
 #    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 #    chmod 700 get_helm.sh
 #    ./get_helm.sh && rm get_helm.sh
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 - name: Add Cilium CNI Helm repository
   become: no
   shell: |
     helm repo add cilium {{ cilium_helm_repository }}   
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 - name: Install Cilium CNI using Helm chart 
   become: no
   shell: |
     helm install cilium {{ cilium_helm_chart }} --version {{ cilium_version }} --set ipam.mode=cluster-pool --set ipam.operator.clusterPoolIPv4PodCIDR={{ k8s_pods_subnet }} --set ipam.operator.clusterPoolIPv4MaskSize={{ k8s_pods_subnetmask }} --namespace kube-system 
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 - name: Enable Hubble observatory in Cilium using Helm
   become: no
   shell: |
     helm upgrade cilium cilium/cilium --version {{ cilium_version }} --namespace kube-system --reuse-values --set hubble.relay.enabled=true --set hubble.ui.enabled=true
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium") and (cilium_activate_hubble == "yes")
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium") and (cilium_activate_hubble == "yes")
 
 #- name: Add Cilium CNI Helm repository
 #  helm_repository:
 #    name: stable
 #    repo_url: "{{ cilium_helm_repository }}"
 #    repo_state: present
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 #- name: Install Cilium CNI using Helm chart 
 #  helm:
@@ -258,7 +258,7 @@
 #    chart_ref: "{{ cilium_helm_chart }}"
 #    release_namespace: cilium 
 #    namespace: kube-system
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 ################
 # Weave specific
@@ -272,7 +272,7 @@
     state: enabled
   notify:
     - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "weave")
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "weave")
 
 - name: Set firewall rules for Weave CNI on CentOS/Redhat/Rock-Linux
   firewalld:
@@ -289,11 +289,11 @@
     - 6784/udp
   notify:
     - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "weave")
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "weave")
 
 - name: Deploy Weave CNI on Centos, Redhat or Rocky-LinuxUbuntu
   become: no
   shell: kubectl apply -f {{ centos_weave_url }} 
   #command: kubectl --kubeconfig=~{{ remote_user }}/.kube/config apply -f {{ centos_weave_url }} 
   #command: kubectl apply -f {{ centos_weave_url }} 
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "weave")
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "weave")

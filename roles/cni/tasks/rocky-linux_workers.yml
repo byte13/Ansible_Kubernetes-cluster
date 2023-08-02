@@ -15,7 +15,7 @@
 #    firewall-cmd --set-default-zone trusted 
 #  notify:
 #    - reload firewalld
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "calico")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "calico")
 
 #- name: Set interface "{{ centos_host_interface }}" in public firewall zone on CentOS/Redhat/Rock-Linux
 #  firewalld:
@@ -26,7 +26,7 @@
 #    state: enabled
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 #- name: Set interface {{ centos_host_interface }} in public firewall zone on CentOS/Redhat/Rock-Linux
 #  become: yes
@@ -34,7 +34,7 @@
 #    firewall-cmd --zone=public --add-interface={{ centos_host_interface }} --permanent
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 #- name: Set firewall masquerade Calico CNI on CentOS/Redhat/Rock-Linux
 #  firewalld:
@@ -43,7 +43,7 @@
 #    state: enabled
 #    permanent: yes
 #    immediate: yes
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 #- name: Set firewall rules for Calico CNI to allow BGP on CentOS/Redhat/Rock-Linux
 #  firewalld:
@@ -57,7 +57,7 @@
 #    - 179/tcp
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 # Next rule required if Calico ipipMode is set to "Always".
 # Not required if ipipMode is set to "CrossSubnet" and all nodes are in same subnet
@@ -65,7 +65,7 @@
 #  shell: /bin/firewall-cmd --permanent --add-protocol=4  --zone public
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "calico")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
 
 # Ensure NetworkManager doesn't manage Calico interfaces
 # Reference : https://docs.tigera.io/calico/latest/operations/troubleshoot/troubleshooting#configure-networkmanager
@@ -97,7 +97,7 @@
 #    firewall-cmd --set-default-zone trusted 
 #  notify:
 #    - reload firewalld
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 #- name: Set interface "{{ centos_host_interface }}" in public firewall zone on CentOS/Redhat/Rock-Linux
 #firewalld:
@@ -108,7 +108,7 @@
 #    state: enabled
 #  notify:
 #    - reload firewalld
-#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "cilium")
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "cilium")
 
 - name: Set firewall masquerade n public firewalld zone on CentOS/Redhat/Rock-Linux
   firewalld:
@@ -117,7 +117,7 @@
     state: enabled
     permanent: yes
     immediate: yes
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "cilium")
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "cilium")
 
 - name: Set firewall rules for Cilium CNI to allow health checks and VXLAN on CentOS/Redhat/Rock-Linux
   firewalld:
@@ -132,7 +132,7 @@
     - 4240/tcp
   notify:
     - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "cilium")
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "cilium")
 
 ################
 # Weave specific
@@ -146,7 +146,7 @@
     state: enabled
   notify:
     - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "weave")
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "weave")
 
 - name: Set firewall rules for Weave CNI on CentOS/Redhat/Rock-Linux
   firewalld:
@@ -163,4 +163,4 @@
     - 6784/udp
   notify:
     - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_cni == "weave")
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "weave")

@@ -1,12 +1,6 @@
 ---
 # tasks file for cri-o on Rocky Linux, Redhat or CentOS
-
-- name: Install updates using dnf on {{ ansible_facts['os_family'] }}
-  dnf:
-    name: "*"
-    state: latest
-    exclude: kubelet
-
+#
 - name: Create system network configuration file {{ crio_net_configfile }}
   file:
     path: "{{ crio_net_configfile }}"
@@ -73,7 +67,7 @@
     marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: "" 
-  #when: dependencies_proxy_required != "yes"
+  #when: global_proxy_required != "yes"
 
 # Configure CRI-O system startup environment file to add proxy variables
 # If required, set proxy environment variables in /etc/sysconfig/crio 
@@ -84,13 +78,13 @@
 #    marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
 #    marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
 #    block: |
-#      Environment="http_proxy={{ crio_http_proxy }}"
-#      Environment="https_proxy={{ crio_https_proxy }}" 
-#      Environment="no_proxy={{ crio_no_proxy }}"
-#      Environment="HTTP_PROXY={{ crio_http_proxy }}"
-#      Environment="HTTPS_PROXY={{ crio_https_proxy }}" 
-#      Environment="NO_PROXY={{ crio_no_proxy }}"
-#  when: dependencies_proxy_required == "yes"
+#      Environment="http_proxy={{ global_http_proxy }}"
+#      Environment="https_proxy={{ globl_https_proxy }}" 
+#      Environment="no_proxy={{ global_no_proxy }}"
+#      Environment="HTTP_PROXY={{ global_http_proxy }}"
+#      Environment="HTTPS_PROXY={{ global_https_proxy }}" 
+#      Environment="NO_PROXY={{ global_no_proxy }}"
+#  when: global_proxy_required == "yes"
 
 # Possibly remove proxy environment variables in /usr/lib/systemd/system/crio.service 
 - name: No proxy required - Remove proxy variable from {{ centos_crio_startupfile }} 
@@ -99,7 +93,7 @@
     marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: "" 
-  #when: dependencies_proxy_required != "yes"
+  #when: global_proxy_required != "yes"
 
 # Configure CRI-O system startup file to add proxy variables
 # If required, set proxy environment variables in /usr/lib/systemd/system/crio.service 
@@ -110,13 +104,13 @@
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     insertafter: "^EnvironmentFile="
     block: |
-      Environment=http_proxy={{ crio_http_proxy }}
-      Environment=https_proxy={{ crio_https_proxy }}
-      Environment=no_proxy={{ crio_no_proxy }}
-      Environment=HTTP_PROXY={{ crio_http_proxy }}
-      Environment=HTTPS_PROXY={{ crio_https_proxy }}
-      Environment=NO_PROXY={{ crio_no_proxy }}
-  when: dependencies_proxy_required == "yes"
+      Environment=http_proxy={{ global_http_proxy }}
+      Environment=https_proxy={{ global_https_proxy }}
+      Environment=no_proxy={{ global_no_proxy }}
+      Environment=HTTP_PROXY={{ global_http_proxy }}
+      Environment=HTTPS_PROXY={{ global_https_proxy }}
+      Environment=NO_PROXY={{ global_no_proxy }}
+  when: global_proxy_required == "yes"
 
 # Upload registries configuration file
 - name: "Upload registries configuration file"  
@@ -153,7 +147,7 @@
 #    group: root
 #    mode: 0640
 #    backup: yes
-#  when: centos_cni != 'calico'
+#  when: global_cni != 'calico'
 
 - name: "Restart CRI-O" 
   systemd:

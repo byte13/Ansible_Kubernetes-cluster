@@ -5,7 +5,7 @@
 # Common variables
 #
 # If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
-cni_display_facts: "no"
+cni_display_facts: "{{ global_display_facts }}"
 # Kubernetes pods subnet
 # Ensure there is no overlap with enterprise subnets so that there is no routing ambiguity in the pods
 k8s_pods_subnet: "10.100.0.0/16"
@@ -24,7 +24,7 @@ cilium_activate_hubble: "no"
 # CentOS specific
 # CNI to be used
 #centos_cni: antrea
-centos_cni: calico
+centos_cni:  "{{ global_cni }}"
 #centos_cni: cilium
 #centos_cni: weave
 # URL for CNI

@@ -26,14 +26,6 @@ crio_registries_configfile: "/etc/containers/registries.conf"
 crio_crio_configfile: "/etc/crio/crio.conf"
 # CRI-O bridge configuration file
 crio_bridge_configfile: "/etc/cni/net.d/100-crio-bridge.conf"
-# Next few lines to be set in case managed machines must access Internet via a proxy
-# Example if the proxy requires HTTP Basic authentication
-# http_proxy=http://USERNAME:PASSWORD@SERVER:PORT/
-#crio_proxy_required: "yes"
-crio_proxy_required: "no"
-crio_http_proxy:  "http://10.13.4.254:3128"
-crio_https_proxy: "http://10.13.4.254:3128"
-crio_no_proxy:    ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 #
 # End of common varibles
 ######################################################

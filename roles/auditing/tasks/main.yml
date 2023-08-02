@@ -21,8 +21,9 @@
 # Set apiserver auditing policy file
 - name: Upload apiserver audit policy file 
   template:
-    src: B13_K8S_Audit-Policy_simple.j2
+    src: K8S_Audit-Policy_simple.j2
     dest:   "{{ audit_apiserver_policyfile }}"
+    backup: true
     owner: root
     group: root
     mode:  0640
@@ -30,6 +31,10 @@
 # Modify apiserver static pod manifest to add auditing
 - name: Modify {{ k8s_apiserver_manifest }} to add auditing
   blockinfile:
+    path: "{{ k8s_apiserver_manifest }}"
+    # Don't backup manifest file; on restart, the apiserver use the backup file instead of the new file :-(
+    backup: "false"
+    insertafter: '^[\s]*\- kube-apiserver[\s]*$'
     marker_begin: "Begin marker -"
     marker: "# {mark} Ansible edit : command line options for auditing"
     marker_end: "End marker -"
@@ -40,30 +45,33 @@
           - --audit-log-maxage=1
           - --audit-log-maxsize=20
           - --audit-log-maxbackup=5
-    path: "{{ k8s_apiserver_manifest }}"
-    insertafter: '^[\s]*\- kube-apiserver[\s]*$'
-    backup: yes
 
 # Modify apiserver static pod manifest to add audit volume mount point 
 - name: Modify {{ k8s_apiserver_manifest }} to add audit volume mount point
   blockinfile:
+    path: "{{ k8s_apiserver_manifest }}"
+    # Don't backup manifest file; on restart, the apiserver use the backup file instead of the new file :-(
+    backup: "false"
+    insertafter: '^[\s]*volumeMounts\:[\s]*$'
     marker_begin: "Begin marker -"
     marker: "# {mark} Ansible edit : MountPath for auditing"
     marker_end: "End marker -"
     #block: "{{ audit_apiserver_volumeMounts }}"
     block: |2
           - mountPath: {{ audit_apiserver_policyfile }}
-            name: b13-audit-policy
+            name: k8s-audit-policy
             readOnly: true
           - mountPath: {{ audit_apiserver_logfile }}
-            name: b13-audit-log
+            name: k8s-audit-log
             readOnly: false
-    path: "{{ k8s_apiserver_manifest }}"
-    insertafter: '^[\s]*volumeMounts\:[\s]*$'
 
 # Modify apiserver static pod manifest to add audit volume
 - name: Modify {{ k8s_apiserver_manifest }} to add audit volume
   blockinfile:
+    path: "{{ k8s_apiserver_manifest }}"
+    # Don't backup manifest file; on restart, the apiserver use the backup file instead of the new file :-(
+    backup: "false"
+    insertafter: '^[\s]*volumes\:[\s]*$'
     marker_begin: "Begin marker -"
     marker: "# {mark} Ansible edit : Volumes for auditing"
     marker_end: "End marker -"
@@ -72,10 +80,15 @@
         - hostPath:
             path: {{ audit_apiserver_policyfile }}
             type: File
-          name: b13-audit-policy
+          name: k8s-audit-policy
         - hostPath:
             path: {{ audit_apiserver_logfile }}
             type: FileOrCreate
-          name: b13-audit-log
-    path: "{{ k8s_apiserver_manifest }}"
-    insertafter: '^[\s]*volumes\:[\s]*$'
+          name: k8s-audit-log
+
+- name: "Restart kubelet to restart apiserver with modified manifest file"
+  systemd:
+    name: kubelet
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

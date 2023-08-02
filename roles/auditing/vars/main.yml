@@ -5,7 +5,7 @@
 # Common variables
 #
 audit_apiserver_policydir: /etc/kubernetes/policies
-audit_apiserver_policyfile: "{{ audit_apiserver_policydir }}/B13_K8S_Audit-Policy_simple.yaml"
+audit_apiserver_policyfile: "{{ audit_apiserver_policydir }}/K8S_Audit-Policy_simple.yaml"
 audit_apiserver_logdir: /var/log/apiserver
 audit_apiserver_logfile: "{{ audit_apiserver_logdir }}/audit.log"
 k8s_apiserver_manifest: /etc/kubernetes/manifests/kube-apiserver.yaml

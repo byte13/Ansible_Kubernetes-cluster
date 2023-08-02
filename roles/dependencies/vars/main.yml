@@ -4,19 +4,9 @@
 ######################################################
 # Common variables
 #
-# If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
-dependencies_display_facts: "no"
+
 # Helm URL
 dependencies_helm_URL: "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
-# Next few lines to be set in case managed machines must access Internet via a proxy
-# Example if the proxy requires HTTP Basic authentication
-# http_proxy=http://USERNAME:PASSWORD@SERVER:PORT/
-#dependencies_proxy_required: "yes"
-dependencies_proxy_required: "no"
-dependencies_http_proxy:  "http://10.13.4.254:3128"
-dependencies_https_proxy: "http://10.13.4.254:3128"
-dependencies_no_proxy:    ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
-dependencies_proxy_profile: "/etc/profile.d/http_proxy.sh"
 
 #
 # End of common varibles

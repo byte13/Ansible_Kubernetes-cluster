@@ -1,6 +1,11 @@
 apiVersion: audit.k8s.io/v1
 kind: Policy
 rules:
+  # Log kubernetes-admin (default admin created by kubeadm) activities at metdata level
+  #- level: Metadata
+  #  users:
+  #  - kubernetes-admin
+
   # Do not log from kube-system accounts
   - level: None
     UserGroups:
