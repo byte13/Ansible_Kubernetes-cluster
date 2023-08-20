@@ -23,6 +23,7 @@
     - cni
     - auditing
 #    - ingress
+
 - hosts: k8sworkernodes 
   remote_user: user1
   become: yes

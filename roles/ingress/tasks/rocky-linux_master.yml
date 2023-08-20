@@ -18,24 +18,39 @@
     immediate: yes
     state: enabled
   loop:
-    # For Calico CNI
     - 80/tcp
     - 443/tcp
     - 1024/tcp
   notify:
     - reload firewalld
-  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_ingress == "haproxy")
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_ingress == "haproxy") and (global_cni != "calico")
 
-- name: Add HAproxy controler Helm repository
+- name: Add HAproxy controller Helm repository
   become: no
   shell: |
     helm repo add {{ centos_haproxy_helm_repository }}
+    helm repo update
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
 
-- name: Install HAproxy controler using Helm chart 
+- name: Upload Ingress controller helm chart value file to {{ ingress_haproxy_helmvaluesfile }} 
+  become: no
+  template:
+    src:   haproxy-ingress-values.j2 
+    dest:  "{{ ingress_haproxy_helmvaluesfile }}"
+    mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
+
+- name: Install HAproxy controller using Helm chart 
   become: no
   shell: |
     # By default, the ingress controller is installed using a Deployment resource. 
     # To use a DaemonSet instead, set the controller.kind field to DaemonSet and controller.daemonset.useHostPort to true.
-    helm install {{ centos_haproxy_helm_chart }} --create-namespace --namespace {{ centos_haproxy_namespace }} --set controller.kind=DaemonSet --set controller.daemonset.useHostPort=true
+    #helm install {{ centos_haproxy_helm_chart }} --create-namespace --namespace {{ centos_haproxy_namespace }} --set controller.kind=DaemonSet --set controller.daemonset.useHostPort=true
+    helm install {{ centos_haproxy_helm_chart }} --create-namespace --namespace ingress-controller --version {{ ingress_haproxy_version }} -f {{ ingress_haproxy_helmvaluesfile }} 
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
+
+- name: "Remove {{ ingress_haproxy_helmvaluesfile }} from remote host"
+  become: no
+  file:
+    path: "{{ ingress_haproxy_helmvaluesfile }}"
+    state: absent

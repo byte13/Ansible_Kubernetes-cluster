@@ -5,7 +5,9 @@
 # Common variables
 #
 # If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
-ingress_display_facts: "no"
+ingress_display_facts: "{{ global_display_facts }}"
+ingress_haproxy_version: "0.14.4"
+ingress_haproxy_helmvaluesfile: "/tmp/haproxy-ingress-values.yaml"
 #
 # End of common varibles
 ######################################################
@@ -13,8 +15,9 @@ ingress_display_facts: "no"
 # CentOS specific
 #
 centos_ingress: "haproxy"
-centos_haproxy_helm_repository: "haproxytech https://haproxytech.github.io/helm-charts"
-centos_haproxy_helm_chart: "kubernetes-ingress haproxytech/kubernetes-ingress"
+centos_haproxy_reponame: "haproxy-ingress"
+centos_haproxy_helm_repository: "{{centos_haproxy_reponame}} https://haproxy-ingress.github.io/charts"
+centos_haproxy_helm_chart: "haproxy-ingress {{centos_haproxy_reponame}}/haproxy-ingress"
 centos_haproxy_namespace: "haproxy-controller"
 # End of CentOS specific
 ######################################################
