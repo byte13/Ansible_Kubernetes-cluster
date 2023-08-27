@@ -4,11 +4,18 @@
 ######################################################
 # Common variables
 #
+
+# kube-apiserver manifest file on master node
+k8s_apiserver_manifest: /etc/kubernetes/manifests/kube-apiserver.yaml
+
+# Directory and containing audit policy
 audit_apiserver_policydir: /etc/kubernetes/policies
 audit_apiserver_policyfile: "{{ audit_apiserver_policydir }}/K8S_Audit-Policy_simple.yaml"
+
+# Directory and file containing audit logs
 audit_apiserver_logdir: /var/log/apiserver
 audit_apiserver_logfile: "{{ audit_apiserver_logdir }}/audit.log"
-k8s_apiserver_manifest: /etc/kubernetes/manifests/kube-apiserver.yaml
+
 # apiserver command line arguments for auditing
 #audit_apiserver_args: |2
 #          - --audit-policy-file={{ audit_apiserver_policyfile }}
@@ -36,8 +43,10 @@ k8s_apiserver_manifest: /etc/kubernetes/manifests/kube-apiserver.yaml
 #          type: FileOrCreate
 #        name: b13-audit-log
 #
+#
 # End of common varibles
 ######################################################
+
 ######################################################
 # Rocky Linux (CentOS) specific
 #

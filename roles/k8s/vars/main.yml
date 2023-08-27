@@ -4,44 +4,61 @@
 ######################################################
 # Common variables
 #
+
 # Kubernetes version to be installed.
-# Ensure that cri-o minor version is the same as Kubernetes
-# Available version of Kubernetes and cri-o can be found using :
-# curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
-# https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:
-k8s_version: "1.27"
+#     Ensure that the 2 digits after the . in cri-o version is the same as Kubernetes one
+#     Available version of Kubernetes and cri-o can be found using :
+#         curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
+#         https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:
+#         or : dnf --showduplicates list | grep kube
+#              dnf --showduplicates list | grep cri
+k8s_version: "{{ global_k8s_minorversion }}"
+
 # To display the ansible facts while running the playbook, set the following variable to "yes"
 k8s_display_facts: "{{ global_display_facts }}"
+
 # To reset the cluster, set the following variable to "yes"
-k8s_reset_cluster: "yes"
+#     Set to no on first deployment, then yes in case of re-deployment of a running cluster
+k8s_reset_cluster: "no"
+
 # K8S apiserver IP address
-k8s_apiserver_advip: "10.13.4.1"
+k8s_apiserver_advip: "10.13.4.10"
+
 # Kubernetes pods subnet
-# Ensure that the specified range doesn't overlap with other enterprise subnets so that no routing ambiguity exists in the pods.
+#     Ensure that the specified range doesn't overlap with other enterprise subnets so that no routing ambiguity exists in the pods.
 k8s_pods_subnet: "10.100.0.0/16"
+
 # Kubernetes services subnet
-# Ensure that the specified range doesn't overlap with other enterprise subnets so that no routing ambiguity exists in the pods.
+#     Ensure that the specified range doesn't overlap with other enterprise subnets so that no routing ambiguity exists in the pods.
 k8s_services_subnet: "10.150.0.0/16"
+
 # Parameters to set in Kubelet config file instead of passing them as deprecated command line arguments
 k8s_cluster_kubelet_configfile: "/etc/kubernetes/cluster-kubelet-config.yaml"
 k8s_cgroup_driver: "systemd"
 #k8s_cgroup_driver: "cgroupfs"
+
 # Arguments to pass to kubelet process
 k8s_kubelet_extraargs: "--cgroup-driver=systemd --container-runtime-endpoint='unix:///var/run/crio/crio.sock"
 #k8s_kubelet_extraargs: "--cgroup-driver=cgroupfs"
 #k8s_kubelet_extraargs: "--cgroup-driver=cgroupfs --container-runtime=remote --container-runtime-endpoint='unix:///var/run/crio/crio.sock"
 #k8s_kubelet_extraargs: "--config={{ k8s_cluster_kubelet_configfile }} --container-runtime=remote --container-runtime-endpoint='unix:///var/run/crio/crio.sock"
+
 # Destination file to contain aforementioned arguments
 k8s_kubelet_extraargs_destfile: "/etc/default/kubelet"
+
 # Local directory and files containing the command to be run on worker nodes to join the cluster
 k8s_join_dir: "/B13/IAC/ANSIBLE/Ansible_Kubernetes-cluster"
+
 #k8s_join_master_file: "k8s_masters_join.txt"
 k8s_join_worker_file: "k8s_workers_join.txt"
+
 # Local directory which will contain kubeconfig file to be used to connect to the cluster
 k8s_kubeconfig_dir: "/B13/IAC/ANSIBLE/Ansible_Kubernetes-cluster"
+
 #ansible_user: "user1" # Use become_user from hosts inventory file instead
 # Helm URL
 k8s_helm_URL: "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
+
 #
 # End of common varibles
 ######################################################
@@ -50,24 +67,25 @@ k8s_helm_URL: "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm
 #
 # Is selinux installed ?
 centos_selinux: "yes"
+
 # Define if selinux state must be "enforcing", "permissive" or "disabled" after cluster activation
 #centos_selinux_state: "enforcing"
 centos_selinux_state: "permissive"
+
 # yum repository for Kubernetes
-centos_k8s_reponame1: "kubernetes"
-centos_k8s_repobaseurl1: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
-centos_k8s_repogpgkey1: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" 
-centos_k8s_repodesc1: "Kubernetes repository"
+centos_k8s_reponame1: "{{ global_k8s_reponame1 }}"
+centos_k8s_repodesc1:  "{{ global_k8s_repodesc1 }}"
+centos_k8s_repobaseurl1: "{{ global_k8s_repobaseurl1 }}"
+centos_k8s_repogpgkey1: "{{ global_k8s_repogpgkey1 }}"
+
 # Packages to be installed
-# tc utility required by kubeadm
+#     tc utility required by kubeadm
 centos_tc_pkgname: "iproute-tc"
 centos_nettools_pkgname: "net-tools"
-#centos_kubeadm_pkgname: "kubeadm={{ k8s_version }}"
-#centos_kubelet_pkgname: "kubelet={{ k8s_version }}"
-#centos_kubectl_pkgname: "kubectl={{ k8s_version }}"
 centos_kubeadm_pkgname: "kubeadm"
 centos_kubelet_pkgname: "kubelet"
 centos_kubectl_pkgname: "kubectl"
+
 #
 # End of CentOS specific
 ######################################################
@@ -77,18 +95,22 @@ centos_kubectl_pkgname: "kubectl"
 #
 # Is selinux installed ?
 ubuntu_selinux: "no"
+
 # Define if selinux state must be "enforcing", "permissive" or "disabled" after cluster activation
 ubuntu_selinux_state: "enforcing"
+
 # Kubernetes repository for Ubuntu
 ubuntu_k8s_repourl1: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
 ubuntu_k8s_gpgkey1: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
 ubuntu_k8s_repofilename1: "kubernetes-{{k8s_version}}"
+
 #ubuntu_kubeadm_pkgname: "kubeadm={{ k8s_version }}"
 #ubuntu_kubelet_pkgname: "kubelet={{ k8s_version }}"
 #ubuntu_kubectl_pkgname: "kubectl={{ k8s_version }}"
 ubuntu_kubeadm_pkgname: "kubeadm"
 ubuntu_kubelet_pkgname: "kubelet"
 ubuntu_kubectl_pkgname: "kubectl"
+
 #
 # End of Ubuntu specific
 ######################################################

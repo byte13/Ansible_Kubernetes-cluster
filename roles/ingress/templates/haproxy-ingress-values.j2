@@ -2,3 +2,6 @@ controller:
   hostNetwork: true
   ingressClassResource:
     enabled: true
+  kind: DaemonSet
+  daemonset:
+    useHostPort: true 

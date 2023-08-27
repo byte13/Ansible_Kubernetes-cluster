@@ -4,15 +4,22 @@
 ######################################################
 # Common variables
 #
+#
 # If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
 cni_display_facts: "{{ global_display_facts }}"
+
 # Kubernetes pods subnet
-# Ensure there is no overlap with enterprise subnets so that there is no routing ambiguity in the pods
+#      Ensure there is no overlap with enterprise subnets so that there is no routing ambiguity in the pods
 k8s_pods_subnet: "10.100.0.0/16"
 k8s_pods_subnetmask: "24"
+
+# Version of Calico to be installed
 calico_version: "v3.26.1"
+
 calico_crd_tempfile: "/tmp/calico_crd.yml"
+
 calico_ippools_tempfile: "/tmp/calico_ippools.yaml"
+
 cilium_helm_repository: "https://helm.cilium.io/"
 cilium_helm_chart: "cilium/cilium"
 cilium_version: "1.11.4"
@@ -20,23 +27,39 @@ cilium_activate_hubble: "no"
 #
 # End of common varibles
 ######################################################
+
 ######################################################
 # CentOS specific
+#
+
 # CNI to be used
-#centos_cni: antrea
 centos_cni:  "{{ global_cni }}"
+#centos_cni: antrea
+#centos_cni: calico
 #centos_cni: cilium
 #centos_cni: weave
-# URL for CNI
+
+centos_host_interface: enp0s3
+
+# Antrea CNI on CentOS related variables 
 centos_antrea_url: "https://raw.githubusercontent.com/antrea-io/antrea/main/build/yamls/antrea.yml"
-# Without operator - check https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
+
+# Calico CNI on CentOS related variables 
+#
+# URL to install Calico without operator
+#     Check https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
 centos_calico_url: "https://raw.githubusercontent.com/projectcalico/calico/{{calico_version}}/manifests/calico.yaml"
-# With operator - check https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
+# URL to install Calico with operator
+#     Check https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
 centos_calico_url1: "https://raw.githubusercontent.com/projectcalico/calico/{{calico_version}}/manifests/tigera-operator.yaml"
 centos_calico_url2: "https://raw.githubusercontent.com/projectcalico/calico/{{calico_version}}/manifests/custom-resources.yaml"
-centos_weave_url: "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-centos_host_interface: enp0s3
 centos_calico_netmgr_configfile: "/etc/NetworkManager/conf.d/calico.conf"
+
+# Weave on CentOS related variables 
+#
+# URL to install Weave with operator
+centos_weave_url: "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
 #
 # End of CentOS specific
 ######################################################

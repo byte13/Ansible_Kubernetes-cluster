@@ -22,9 +22,10 @@
     enabled: yes
     daemon_reload: yes 
 
-- name: start kubelet
+- name: enable and start kubelet
   systemd:
     name: kubelet 
+    enabled: yes
     state: started
     daemon_reload: yes 
 

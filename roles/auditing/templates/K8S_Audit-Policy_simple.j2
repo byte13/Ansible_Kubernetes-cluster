@@ -2,15 +2,15 @@ apiVersion: audit.k8s.io/v1
 kind: Policy
 rules:
   # Log kubernetes-admin (default admin created by kubeadm) activities at metdata level
-  #- level: Metadata
+  - level: Metadata
   #  users:
   #  - kubernetes-admin
-     groups:
-     - allprojects
+    userGroups:
+    - allprojects
 
   # Do not log from kube-system accounts
   - level: None
-    UserGroups:
+    userGroups:
     - system:serviceaccounts:kube-system
   - level: None
     users:
@@ -22,7 +22,7 @@ rules:
 
   # Do not log from collector
   - level: None
-    Users:
+    users:
     - system:serviceaccount:collectorforkubernetes:collectorforkubernetes
 
   # Don't log nodes communications

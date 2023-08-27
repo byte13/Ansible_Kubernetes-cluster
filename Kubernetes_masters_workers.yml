@@ -15,14 +15,21 @@
     global_http_proxy:     "http://{{global_proxy_ip}}:{{global_proxy_port}}"
     global_https_proxy:    "http://{{global_proxy_ip}}:{{global_proxy_port}}"
     global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" 
+    # yum repository for Kubernetes
+    global_k8s_reponame1: "kubernetes"
+    global_k8s_repodesc1: "Kubernetes repository"
+    global_k8s_repobaseurl1: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
+    global_k8s_repogpgkey1: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+    global_k8s_version: "1.27"
+    global_k8s_minorversion: "1.27.5-0"
 
   roles: 
-    - dependencies
-    - cri-o
-    - k8s
-    - cni
-    - auditing
-#    - ingress
+  - dependencies
+  - cri-o
+  - k8s
+  - cni
+  - auditing
+#  - ingress
 
 - hosts: k8sworkernodes 
   remote_user: user1
@@ -41,6 +48,13 @@
     global_http_proxy:     "http://{{global_proxy_ip}}:{{global_proxy_port}}"
     global_https_proxy:    "http://{{global_proxy_ip}}:{{global_proxy_port}}"
     global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" 
+    # yum repository for Kubernetes
+    global_k8s_reponame1: "kubernetes"
+    global_k8s_repodesc1: "Kubernetes repository"
+    global_k8s_repobaseurl1: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
+    global_k8s_repogpgkey1: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+    global_k8s_version: "1.27"
+    global_k8s_minorversion: "1.27.5-0"
 
   roles: 
   - dependencies

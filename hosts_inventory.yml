@@ -5,11 +5,11 @@ all:
       children:
         k8smasternodes:
           hosts:
-            winux041.lab.byte13.org:
+            k8smaster10.lab.byte13.org:
         k8sworkernodes:
           hosts:
-            winux042.lab.byte13.org:
-            winux043.lab.byte13.org:
+            k8sworker11.lab.byte13.org:
+            k8sworker12.lab.byte13.org:
       vars:
         become: false
         remote_user: user1 

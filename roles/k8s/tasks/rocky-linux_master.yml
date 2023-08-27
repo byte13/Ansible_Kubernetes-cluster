@@ -38,6 +38,16 @@
   notify:
     - restart firewalld
 
+# Stop and disable firewalld; use Calico to manage IP filtering on Kubernetes nodes interfaces
+# References: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements
+#             https://docs.tigera.io/calico/latest/network-policy/hosts
+- name: Stop and disable firewalld; use Calico to manage IP filtering on Kubernetes nodes interfaces
+  ansible.builtin.service:
+    name: firewalld
+    state: stopped
+    enabled: no
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == 'calico')
+
 - name: "Disable memory swapping to disk since kubernetes cannot work with swap enabled"
   shell: |
     swapoff -a
@@ -91,9 +101,12 @@
       - "{{ centos_kubeadm_pkgname }}"
       - "{{ centos_kubelet_pkgname }}"
       - "{{ centos_kubectl_pkgname }}"
+      - "{{ centos_kubeadm_pkgname }}-{{ k8s_version }}"
+      - "{{ centos_kubelet_pkgname }}-{{ k8s_version }}"
+      - "{{ centos_kubectl_pkgname }}-{{ k8s_version }}"
     state: absent
     update_cache: yes
-  when: k8s_reset_cluster == "yes"
+  #when: k8s_reset_cluster == "yes"
 
 - name: "Recursively remove /etc/kubernetes"
   ansible.builtin.file:
@@ -101,7 +114,6 @@
     state: absent
   when: k8s_reset_cluster == "yes"
 
-# Installation of kubeadm, kubelet and kubectl 
 - name: "Add Kubernetes yum repository"
   yum_repository:
     name: "{{ centos_k8s_reponame1 }}"
@@ -116,16 +128,16 @@
     name:
       - "{{ centos_tc_pkgname }}"
       - "{{ centos_nettools_pkgname }}"
-      - "{{ centos_kubeadm_pkgname }}"
-      - "{{ centos_kubelet_pkgname }}"
-      - "{{ centos_kubectl_pkgname }}"
+      - "{{ centos_kubeadm_pkgname }}-{{ k8s_version }}"
+      - "{{ centos_kubelet_pkgname }}-{{ k8s_version }}"
+      - "{{ centos_kubectl_pkgname }}-{{ k8s_version }}"
     state: present
     update_cache: yes
   notify:
-    - enable kubelet 
+    - enable and start kubelet
 
-# Initialize Kubernetes cluster using kubeadm
-- name: "Reset cluster (set k8s_reset_cluster variable to 'no' to not re-initialize the cluster)"
+# Reset Kubernetes cluster using kubeadm
+- name: "Possibly reset cluster (set k8s_reset_cluster variable to 'no' to not re-initialize the cluster)"
   command: kubeadm reset -f
   when: k8s_reset_cluster == "yes"
 
@@ -153,10 +165,10 @@
   command: kubeadm init --apiserver-advertise-address={{ k8s_apiserver_advip }} \
                         --service-cidr={{ k8s_services_subnet }} \
                         --pod-network-cidr={{ k8s_pods_subnet }}
+                        #--cri-socket=/var/run/crio/crio.sock
   #command: kubeadm init --config={{ k8s_cluster_kubelet_configfile }}
-  when: (inventory_hostname in groups['k8smasternodes']) and (k8s_reset_cluster == "yes")
+  when: inventory_hostname in groups['k8smasternodes']
 
-# Copy kubeconfig in $HOME/.kube/config
 - name: "Create ~{{ remote_user }}/.kube directory on target node"
   file:
     path: ~{{ remote_user }}/.kube
@@ -186,7 +198,7 @@
 - name: "Save join command for workers in local {{ k8s_join_dir }}/{{ inventory_hostname }}_{{ k8s_join_worker_file }}"
   become: no
   local_action:
-    copy content="{{ kubernetes_join_worker_command.stdout_lines[0] }}" dest="{{ k8s_join_dir }}/{{ inventory_hostname }}_{{ k8s_join_worker_file }}" mode=0600
+    copy content="{{ kubernetes_join_worker_command.stdout_lines[0] }}" dest="{{ k8s_join_dir }}/{{ inventory_hostname }}_{{ k8s_join_worker_file }}" mode="0600"
   when: inventory_hostname in groups['k8smasternodes'] 
 
 # Create soft link to join command file to be used later on worker nodes 

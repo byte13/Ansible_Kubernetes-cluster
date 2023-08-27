@@ -5,8 +5,8 @@
 # Common variables
 #
 # If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
+#ingress_haproxy_version: "0.14.4"
 ingress_display_facts: "{{ global_display_facts }}"
-ingress_haproxy_version: "0.14.4"
 ingress_haproxy_helmvaluesfile: "/tmp/haproxy-ingress-values.yaml"
 #
 # End of common varibles
