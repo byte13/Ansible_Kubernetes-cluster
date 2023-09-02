@@ -19,7 +19,7 @@ k8s_display_facts: "{{ global_display_facts }}"
 
 # To reset the cluster, set the following variable to "yes"
 #     Set to no on first deployment, then yes in case of re-deployment of a running cluster
-k8s_reset_cluster: "no"
+k8s_reset_cluster: "yes"
 
 # K8S apiserver IP address
 k8s_apiserver_advip: "10.13.4.10"
