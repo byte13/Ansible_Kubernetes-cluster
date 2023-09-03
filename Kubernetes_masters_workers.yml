@@ -24,12 +24,12 @@
     global_k8s_minorversion: "1.27.5-0"
 
   roles: 
-  - dependencies
-  - cri-o
-  - k8s
-  - cni
-  - auditing
-#  - ingress
+#  - dependencies
+#  - cri-o
+#  - k8s
+#  - cni
+#  - auditing
+  - ingress
 
 - hosts: k8sworkernodes 
   remote_user: user1
@@ -57,7 +57,7 @@
     global_k8s_minorversion: "1.27.5-0"
 
   roles: 
-  - dependencies
-  - cri-o
-  - k8s
-  - cni
+#  - dependencies
+#  - cri-o
+#  - k8s
+#  - cni
