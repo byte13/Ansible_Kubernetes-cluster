@@ -203,14 +203,12 @@
   when: inventory_hostname in groups['k8smasternodes'] 
 
 # Retrieve kubeconfig file under {{ k8s_kubeconfig_dir }}
-- name: "Retrieve kubeconfig file under {{ k8s_kubeconfig_dir }}. To manage the cluster, use kubectl --kubeconfig={{ inventory_hostname }}.conf ..."
+- name: "Retrieve kubeconfig file under {{ k8s_kubeconfig_dir }}. To manage the cluster, use kubectl --kubeconfig={{ inventory_hostname }}_admin.conf ..."
   fetch:
     src: /etc/kubernetes/admin.conf
     dest: "{{ k8s_kubeconfig_dir }}/{{ inventory_hostname }}_admin.conf"
     flat: yes
     validate_checksum: yes
-    mode: 0600
-    backup: yes
   when: inventory_hostname in groups['k8smasternodes'] 
 
 - name: "Restart kubelet" 
