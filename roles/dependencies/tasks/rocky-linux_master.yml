@@ -57,8 +57,8 @@
       export NO_PROXY="{{ global_no_proxy }}"
   when: global_proxy_required == "yes" 
 
-# Possibly remove proxy in /etc/dnf/dnf.conf
-- name: No proxy required - Remove possible proxy from /etc/dnf/dnf.conf 
+# Remove possible proxy definitions from /etc/dnf/dnf.conf
+- name: No proxy required - Remove possible proxy definitions from /etc/dnf/dnf.conf 
   ansible.builtin.blockinfile:
     path: /etc/dnf/dnf.conf 
     backup: yes
@@ -78,7 +78,17 @@
       proxy="{{ global_http_proxy }}"
   when: global_proxy_required == "yes" 
 
-- name: Possible install updates using dnf on {{ ansible_facts['os_family'] }}
+# The following repository is required to install Kubernetes using kubeadm
+# Must be define early in order to install crictl required by kubeadm and to possibly test CRI 
+- name: "Add Kubernetes {{ k8s_version }} Kubernetes yum repository"
+  yum_repository:
+    name: "{{ global_k8s_reponame1 }}"
+    description: "{{ global_k8s_repodesc1 }}"
+    baseurl: "{{ global_k8s_repobaseurl1 }}"
+    gpgcheck: yes
+    gpgkey: "{{ global_k8s_repogpgkey1 }}"
+
+- name: Possibly install updates using dnf on {{ ansible_facts['os_family'] }}
   dnf:
     name: "*"
     state: latest
@@ -105,15 +115,15 @@
   register: retval 
   when: global_proxy_required == "yes"
 
-#- name: "Display returned value"
-#  debug:
-#    var: retval
-
-- name: "Run script to install Helm via proxy, then remove script"
+- name: "Run script to install Helm, then remove script"
   shell: |
     "{{ retval.dest }}" 
     rm -f "{{ retval.dest }}" 
   when: retval.dest is defined and inventory_hostname in groups['k8smasternodes']
+
+#- name: "Display returned value"
+#  debug:
+#    var: retval
 
 - name: "Get script without proxy to install Helm"
   get_url:
@@ -124,7 +134,7 @@
   register: retval 
   when: global_proxy_required != "yes"
 
-- name: "Run script to install Helm without proxy, then remove script"
+- name: "Run script to install Helm, then remove script"
   shell: |
     "{{ retval.dest }}" 
     rm -f "{{ retval.dest }}" 

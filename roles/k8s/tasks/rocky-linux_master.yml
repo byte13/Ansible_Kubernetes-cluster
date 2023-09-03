@@ -106,7 +106,7 @@
       - "{{ centos_kubectl_pkgname }}-{{ k8s_version }}"
     state: absent
     update_cache: yes
-  #when: k8s_reset_cluster == "yes"
+  when: k8s_reset_cluster == "yes"
 
 - name: "Recursively remove /etc/kubernetes"
   ansible.builtin.file:
@@ -114,15 +114,9 @@
     state: absent
   when: k8s_reset_cluster == "yes"
 
-- name: "Add Kubernetes yum repository"
-  yum_repository:
-    name: "{{ centos_k8s_reponame1 }}"
-    state: "present"
-    description: "{{ centos_k8s_repodesc1 }}" 
-    baseurl: "{{ centos_k8s_repobaseurl1 }}"
-    gpgcheck: yes
-    gpgkey: "{{ centos_k8s_repogpgkey1 }}"
-
+# Note that Kubernetes dnf/yum repository has been added by dependencies role
+# crictl has been install by cri-o role
+# crictl is a CLI by Kubernetes to interact with installed CRI; it is required to deploy Kubernetes with kubeadm
 - name: "Install Kubernetes packages: {{ centos_tc_pkgname }}, {{ centos_nettools_pkgname }},{{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}, {{ centos_kubectl_pkgname }}"
   dnf:
     name:
@@ -141,7 +135,7 @@
   command: kubeadm reset -f
   when: k8s_reset_cluster == "yes"
 
-# Upload kubelet configuration file 
+# Upload kubelet configuration file  in dependencies role
 #- name: "Experimental - Upload kubelet configuration file"
 #  template:
 #    src:   cluster-kubelet-config.j2

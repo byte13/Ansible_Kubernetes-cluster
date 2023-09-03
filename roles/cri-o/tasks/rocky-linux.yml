@@ -57,16 +57,9 @@
     gpgkey: "{{ centos_crio_repogpgkey2 }}"
     gpgcheck: yes
 
-# The following repository is required to install crictl which is a preresquisite ot install Kubernetes using kubeadm
-- name: "Add Kubernetes {{ k8s_version }} Kubernetes yum repository"
-  yum_repository:
-    name: "{{ global_k8s_reponame1 }}"
-    description: "{{ global_k8s_repodesc1 }}"
-    baseurl: "{{ global_k8s_repobaseurl1 }}"
-    gpgcheck: yes
-    gpgkey: "{{ global_k8s_repogpgkey1 }}"
-
 # Installation of CRI-O 
+# Notes that Kubernetes repository has bee added in dependencies role; it is required to install crictl
+# crictl is a CLI by Kubernetes to interact with installed CRI; it is required to deploy Kubernetes with kubeadm
 - name: "Install CRI-O {{ crio_version }} packages: {{ centos_crio_pkgname }}, {{ centos_critools_pkgname }}"
   dnf:
     name:

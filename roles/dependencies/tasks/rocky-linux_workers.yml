@@ -78,7 +78,17 @@
       proxy="{{ global_http_proxy }}"
   when: global_proxy_required == "yes" 
 
-- name: Possible install updates using dnf on {{ ansible_facts['os_family'] }}
+# The following repository is required to install Kubernetes using kubeadm
+# Must be define early in order to install crictl required by kubeadm and to possibly test CRI 
+- name: "Add Kubernetes {{ k8s_version }} Kubernetes yum repository"
+  yum_repository:
+    name: "{{ global_k8s_reponame1 }}"
+    description: "{{ global_k8s_repodesc1 }}"
+    baseurl: "{{ global_k8s_repobaseurl1 }}"
+    gpgcheck: yes
+    gpgkey: "{{ global_k8s_repogpgkey1 }}"
+
+- name: Possibly install updates using dnf on {{ ansible_facts['os_family'] }}
   dnf:
     name: "*"
     state: latest
@@ -90,4 +100,11 @@
   dnf:
     name: curl
     state: latest
-  when: inventory_hostname in groups['k8smasternodes']
+  when: inventory_hostname in groups['k8sworkernodes']
+
+- name: Install the latest version of udica
+  become: yes
+  dnf:
+    name: udica
+    state: latest
+  when: inventory_hostname in groups['k8sworkernodes']
