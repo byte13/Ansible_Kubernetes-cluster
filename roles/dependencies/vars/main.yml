@@ -18,10 +18,3 @@ dependencies_helm_URL: "https://raw.githubusercontent.com/helm/helm/main/scripts
 # End of CentOS specific
 ######################################################
 
-######################################################
-# Ubuntu specific
-#
-#
-# End of Ubuntu specific
-######################################################
-

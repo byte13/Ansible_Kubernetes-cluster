@@ -1,22 +1,18 @@
 ---
 # tasks file for k8s 
 # Import Linux distribution specific playbooks
-- name: Install master on RedHat 
+- name: Install CNI on on master RedHat 
   import_tasks: rocky-linux_master.yml
   when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes'])
 
-- name: Install master on Rocky Linux 
+- name: Install CNI on Rocky on master Linux 
   import_tasks: rocky-linux_master.yml
   when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8smasternodes'])
 
-- name: Install master on Debian 
-  import_tasks: ubuntu_master.yml
-  when: (ansible_facts['os_family']|lower == 'debian') and (inventory_hostname in groups['k8smasternodes'])
-
-- name: Install worker on RedHat 
+- name: Install CNI on worker RedHat 
   import_tasks: rocky-linux_workers.yml
   when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8sworkernodes'])
 
-- name: Install worker on Rocky Linux 
+- name: Install CNI on worker Rocky Linux 
   import_tasks: rocky-linux_workers.yml
   when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8sworkernodes'])

@@ -33,12 +33,3 @@ keycloak_ingress_url: "https://raw.githubusercontent.com/keycloak/keycloak-quick
 #
 # End of CentOS specific
 ######################################################
-
-######################################################
-# Ubuntu specific
-#
-
-#
-# End of Ubuntu specific
-######################################################
-

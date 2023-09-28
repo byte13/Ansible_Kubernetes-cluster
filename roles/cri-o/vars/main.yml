@@ -1,5 +1,5 @@
 ---
-# vars file for cri-o on Ubuntu/Debian or Rocky-Linux/Centos/Redhat 
+# vars file for cri-o Rocky-Linux/Centos/Redhat 
 #
 ######################################################
 # Common variables
@@ -58,7 +58,6 @@ centos_crio_reponame2: "devel:kubic:libcontainers:stable:cri-o:{{crio_version}}"
 centos_crio_repodesc2: "{{centos_crio_reponame2}} ({{centos_crio_osversion}})"
 centos_crio_repobaseurl2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/"
 centos_crio_repogpgkey2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/repodata/repomd.xml.key"
-#centos_crio_pkgname: "cri-o-{{crio_version}}"
 centos_crio_pkgname: "cri-o"
 centos_critools_pkgname: "cri-tools-{{critools_version}}"
 # Next line to define CRI-O system startup environment file
@@ -69,23 +68,4 @@ centos_crio_startupfile: "/usr/lib/systemd/system/crio.service"
 # End of CentOS specific
 ######################################################
 
-######################################################
-# Ubuntu specific
-#
-ubuntu_crio_version: "xUbuntu_20.04"
-# Ubuntu containers libraries repository
-ubuntu_crio_repourl1: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ubuntu_crio_version}}/ /"
-ubuntu_crio_gpgkey1: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ubuntu_crio_version}}/Release.key"
-ubuntu_crio_repofilename1: "devel:kubic:libcontainers:stable"
-# CRI-O repository for Ubuntu
-ubuntu_crio_repourl2: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{ubuntu_crio_version}}/ /"
-ubuntu_crio_gpgkey2: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{crio_version}}/{{ubuntu_crio_version}}/Release.key"
-ubuntu_crio_repofilename2: "devel:kubic:libcontainers:stable:cri-o:{{crio_version}}"
-#crio_crio_pkgname: "cri-o-{{crio_version}}"
-ubuntu_crio_pkgname: "cri-o"
-ubuntu_criorunc_pkgname: "cri-o-runc"
-ubuntu_criotools_pkgname: "cri-tools"
-#
-# End of Ubuntu specific
-######################################################
 

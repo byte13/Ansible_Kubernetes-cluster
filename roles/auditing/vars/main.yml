@@ -55,11 +55,3 @@ audit_apiserver_logfile: "{{ audit_apiserver_logdir }}/audit.log"
 # End of CentOS specific
 ######################################################
 
-######################################################
-# Ubuntu specific
-#
-
-#
-# End of Ubuntu specific
-######################################################
-

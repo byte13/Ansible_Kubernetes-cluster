@@ -1,14 +1,10 @@
 ---
 # tasks file for cri-o
 # Import Linux distribution specific playbooks
-- name: Install the correct web server for CentOS or RedHat
+- name: Install CRI-O on master Redhat
   import_tasks: rocky-linux.yml
   when: ansible_facts['os_family']|lower == 'redhat'
 
-- name: Install the correct web server for CentOS or RedHat
+- name: Install CRI-O on master on Rocky-Linux 
   import_tasks: rocky-linux.yml
   when: ansible_facts['os_family']|lower == 'rocky'
-
-- name: Install the correct web server for Ubuntu distributions
-  import_tasks: ubuntu.yml
-  when: ansible_facts['os_family']|lower == 'debian'

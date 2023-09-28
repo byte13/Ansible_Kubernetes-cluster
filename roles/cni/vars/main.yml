@@ -64,25 +64,4 @@ centos_weave_url: "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl versi
 # End of CentOS specific
 ######################################################
 
-######################################################
-# Ubuntu specific
-#
-# CNI to be used
-#ubuntu_cni: antrea
-ubuntu_cni: calico
-#ubuntu_cni: cilium
-#ubuntu_cni: weave
-# URL for CNI
-ubuntu_antrea_url: "https://raw.githubusercontent.com/antrea-io/antrea/main/build/yamls/antrea.yml"
-#ubuntu_calico_url: "https://docs.projectcalico.org/manifests/calico.yaml"
-#ubuntu_calico_url: "https://projectcalico.docs.tigera.io/manifests/calico.yaml"
-#ubuntu_calico_url: "https://docs.projectcalico.org/manifests/calico-typha.yaml"
-#ubuntu_calico_url: "https://projectcalico.docs.tigera.io/manifests/tigera-operator.yaml"
-#ubuntu_calico_url2: "https://projectcalico.docs.tigera.io/manifests/custom-resources.yaml"
-#ubuntu_calico_ippoolsfile: "calico_IPPools.yaml"
-ubuntu_calico_url: "https://projectcalico.docs.tigera.io/manifests/calico.yaml"
-ubuntu_weave_url: "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-#
-# End of Ubuntu specific
-######################################################
 

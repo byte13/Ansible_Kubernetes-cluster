@@ -35,13 +35,9 @@ k8s_services_subnet: "10.150.0.0/16"
 # Parameters to set in Kubelet config file instead of passing them as deprecated command line arguments
 k8s_cluster_kubelet_configfile: "/etc/kubernetes/cluster-kubelet-config.yaml"
 k8s_cgroup_driver: "systemd"
-#k8s_cgroup_driver: "cgroupfs"
 
 # Arguments to pass to kubelet process
 k8s_kubelet_extraargs: "--cgroup-driver=systemd --container-runtime-endpoint='unix:///var/run/crio/crio.sock"
-#k8s_kubelet_extraargs: "--cgroup-driver=cgroupfs"
-#k8s_kubelet_extraargs: "--cgroup-driver=cgroupfs --container-runtime=remote --container-runtime-endpoint='unix:///var/run/crio/crio.sock"
-#k8s_kubelet_extraargs: "--config={{ k8s_cluster_kubelet_configfile }} --container-runtime=remote --container-runtime-endpoint='unix:///var/run/crio/crio.sock"
 
 # Destination file to contain aforementioned arguments
 k8s_kubelet_extraargs_destfile: "/etc/default/kubelet"
@@ -88,30 +84,5 @@ centos_kubectl_pkgname: "kubectl"
 
 #
 # End of CentOS specific
-######################################################
-
-######################################################
-# Ubuntu specific
-#
-# Is selinux installed ?
-ubuntu_selinux: "no"
-
-# Define if selinux state must be "enforcing", "permissive" or "disabled" after cluster activation
-ubuntu_selinux_state: "enforcing"
-
-# Kubernetes repository for Ubuntu
-ubuntu_k8s_repourl1: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
-ubuntu_k8s_gpgkey1: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
-ubuntu_k8s_repofilename1: "kubernetes-{{k8s_version}}"
-
-#ubuntu_kubeadm_pkgname: "kubeadm={{ k8s_version }}"
-#ubuntu_kubelet_pkgname: "kubelet={{ k8s_version }}"
-#ubuntu_kubectl_pkgname: "kubectl={{ k8s_version }}"
-ubuntu_kubeadm_pkgname: "kubeadm"
-ubuntu_kubelet_pkgname: "kubelet"
-ubuntu_kubectl_pkgname: "kubectl"
-
-#
-# End of Ubuntu specific
 ######################################################
 

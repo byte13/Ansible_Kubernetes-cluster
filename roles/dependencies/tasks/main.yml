@@ -1,22 +1,18 @@
 ---
-# tasks file for k8s 
+# tasks file for dependencies 
 # Import Linux distribution specific playbooks
-- name: Install master on RedHat 
+- name: Install dependencies on master RedHat 
   import_tasks: rocky-linux_master.yml
   when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes'])
 
-- name: Install master on Rocky Linux 
+- name: Install dependencies on master Rocky Linux 
   import_tasks: rocky-linux_master.yml
   when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8smasternodes'])
 
-- name: Install master on Debian 
-  import_tasks: ubuntu_master.yml
-  when: (ansible_facts['os_family']|lower == 'debian') and (inventory_hostname in groups['k8smasternodes'])
-
-- name: Install worker on RedHat 
+- name: Install dependencies on worker RedHat 
   import_tasks: rocky-linux_workers.yml
   when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8sworkernodes'])
 
-- name: Install worker on Rocky Linux 
+- name: Install dependencies on worker Rocky Linux 
   import_tasks: rocky-linux_workers.yml
   when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8sworkernodes'])
