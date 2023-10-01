@@ -1,10 +1,12 @@
-vars:
-  become: false
-  remote_user: user1 
-  become_user: root 
 
 
 all:
+
+  vars:
+    become: false
+    remote_user: user1 
+    become_user: root 
+
   hosts:
   children:
      centos:

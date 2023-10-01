@@ -6,15 +6,15 @@
 
   # The following file contains variables to be adjusted to your context or used in several roles
   vars_files:
-    - default/vars/main.yaml 
+    - roles/defaults/vars/main.yml 
 
   roles: 
-  - dependencies
-  - cri-o
-  - k8s
-  - cni
-  - auditing
-#  - ingress
+#  - dependencies
+#  - cri-o
+#  - k8s
+#  - cni
+#  - auditing
+  - ingress
 #  - admission
 #  - cisbenchmark
 
@@ -24,24 +24,9 @@
   become_method: sudo
   become_user: root
 
-  vars:
-    global_display_facts:  "no"
-    global_upgrade_node:   "no"
-    global_cni:            "calico"
-    global_proxy_required: "yes"
-    global_proxy_profile:  "/etc/profile.d/http_proxy.sh"
-    global_proxy_ip:       "10.13.4.254"
-    global_proxy_port:     "3128"
-    global_http_proxy:     "http://{{global_proxy_ip}}:{{global_proxy_port}}"
-    global_https_proxy:    "http://{{global_proxy_ip}}:{{global_proxy_port}}"
-    global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,.svc,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" 
-    # yum repository for Kubernetes
-    global_k8s_reponame1: "kubernetes"
-    global_k8s_repodesc1: "Kubernetes repository"
-    global_k8s_repobaseurl1: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
-    global_k8s_repogpgkey1: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
-    global_k8s_version: "1.27"
-    global_k8s_minorversion: "1.27.5-0"
+  # The following file contains variables to be adjusted to your context or used in several roles
+  vars_files:
+    - roles/defaults/vars/main.yml 
 
   roles: 
 #  - dependencies
