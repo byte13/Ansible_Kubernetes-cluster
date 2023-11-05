@@ -88,7 +88,7 @@
     gpgcheck: yes
     gpgkey: "{{ global_k8s_repogpgkey1 }}"
 
-- name: Possibly install updates using dnf on {{ ansible_facts['os_family'] }}
+- name: Install possible OS updates using dnf on {{ ansible_facts['os_family'] }}
   dnf:
     name: "*"
     state: latest

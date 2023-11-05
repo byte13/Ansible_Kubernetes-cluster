@@ -1,15 +1,8 @@
 # CRI-O containers runtime interface 
 This Ansible role installs CRI-O containers runtime  
-Note that the playbook detects if target OS is Ubuntu or Rocky-Linux/Centos/Redhat and runs respective tasks.   
-So there are variables specific to each OS.   
-
-Fully tested using :
-* Ansible 2.9.6 on Ubuntu 20.04 LTS
-* Rocky-linux 8 as Kubernetes cluster nodes (should work on CentOS 8 and RedHat 8 as well)
-* CRI-O 1.23 as container runtime
 
 ## Main steps to execute this Ansible playbook :
-1. Possibly adjust variables in role/cri-o/var/main.yml (check comments in the file to understand effect of respective variables)
+1. Possibly adjust variables in roles/cri-o/vars/main.yml (check comments in the file to understand effect of respective variables)
    
 ## Directory structure :
 ```

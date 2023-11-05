@@ -29,7 +29,7 @@ Fully tested using :
 ```
     $ vi hosts_inventory.yml 
 ``` 
-6. Follow the instructions in each role/\<role\>/README.md file
+6. Follow the instructions in each roles/\<role\>/README.md file, aspecially in roles/defaults/vars/main.yaml
 
 7. To manage selinux, Ansible requires the installation of a module using the following command :
 ```

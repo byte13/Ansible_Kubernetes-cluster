@@ -1,22 +1,29 @@
 ---
-# vars file for k8s dependencies on Rocky-Linux/Centos/Redhat
+# vars file for global variables Rocky-Linux/Centos/Redhat
+# Some of those variables are referenced in tasks or in other roles/<role>/vars/main.yaml
 #
 ######################################################
 # Common variables
 #
-#
-# dnf/yum repository for Kubernetes
+# Requires Kubernetes version
+# Please, ensure both, major and minor version is available with cri-o, too.
+# Both components version must match
+# References:
+#         https://github.com/cri-o/cri-o
+#         https://kubernetes.io/releases/
 global_k8s_version: "1.27"
 global_k8s_minorversion: "1.27.1"
+
+# dnf/yum repository for Kubernetes
 global_k8s_reponame1: "kubernetes"
 global_k8s_repodesc1: "Kubernetes repository"
 global_k8s_repobaseurl1: "https://pkgs.k8s.io/core:/stable:/v{{ global_k8s_version }}/rpm/"
 global_k8s_repogpgkey1: "https://pkgs.k8s.io/core:/stable:/v{{ global_k8s_version }}/rpm/repodata/repomd.xml.key"
 
-# Define if it is a re-installation which requires to reset running cluster
-global_reset_cluster: "no"
+# Define if it is a re-installation of an running clutser (which requires to reset the cluster)
+global_reset_cluster: "yes"
 
-# Is a proxy used to access Internet
+# Is a proxy used to access Internet (yes/no)
 global_proxy_required: "yes"
 # Respective proxy variables to be adjusted to your context
 global_proxy_profile:  "/etc/profile.d/http_proxy.sh"
