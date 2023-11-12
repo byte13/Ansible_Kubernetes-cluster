@@ -5,8 +5,23 @@ rules:
   - level: Metadata
   #  users:
   #  - kubernetes-admin
+
+  # Logs activities related to a given list of groups of users
+  - level: Metadata
     userGroups:
+    - devgroup1
+    - infragroup1
+    - secgroups
     - allprojects
+
+  # Logs activities related to a list of users
+  #- level: Metadata
+  #  users:
+  #  - johndev1
+  #  - paulinfra1
+  #  - secofficer1
+  #  - janeinfra2
+  #  - bobdev2
 
   # Do not log from kube-system accounts
   - level: None
@@ -20,10 +35,11 @@ rules:
     - system:kube-controller-manager
     - system:node
 
-  # Do not log from collector
+  # Do not log from collector nor from ingress-controller
   - level: None
     users:
     - system:serviceaccount:collectorforkubernetes:collectorforkubernetes
+    - system:serviceaccount:ingress-controller:haproxy-ingress
 
   # Don't log nodes communications
   - level: None

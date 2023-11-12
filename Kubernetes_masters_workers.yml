@@ -9,12 +9,12 @@
     - roles/defaults/vars/main.yml 
 
   roles: 
-  - dependencies
-  - cri-o
-  - k8s
-  - cni
-  - auditing
-#  - ingress
+#  - dependencies
+#  - cri-o
+#  - k8s
+#  - cni
+#  - auditing
+  - ingress
 #  - admission
 #  - cisbenchmark
 
@@ -29,8 +29,8 @@
     - roles/defaults/vars/main.yml 
 
   roles: 
-  - dependencies
-  - cri-o
-  - k8s
-  - cni
+#  - dependencies
+#  - cri-o
+#  - k8s
+#  - cni
 #  - cisbenchmark
