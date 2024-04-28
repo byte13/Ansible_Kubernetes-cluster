@@ -10,7 +10,7 @@
 # HAproxy specific
 ##################
 
-- name: Set firewall rules for ingress trafics on CentOS/Redhat/Rock-Linux
+- name: Set firewall rules for ingress trafics on CentOS/Redhat/Rocky-Linux
   firewalld:
     zone: public
     port: "{{ item }}"
@@ -18,10 +18,9 @@
     immediate: yes
     state: enabled
   loop:
-    # For Calico CNI
+    # For ingress trafics via ingress controllers 
     - 80/tcp
     - 443/tcp
-    - 1024/tcp
   notify:
     - reload firewalld
   when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (inventory_hostname in groups['k8sworkernodes']) and (centos_ingress == "haproxy")

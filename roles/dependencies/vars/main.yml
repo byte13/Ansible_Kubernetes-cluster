@@ -7,6 +7,8 @@
 
 # Helm URL
 dependencies_helm_URL: "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
+# Destination file of Helm installation script
+dependencies_helm_script: "/tmp/get_helm.bash"
 
 #
 # End of common varibles

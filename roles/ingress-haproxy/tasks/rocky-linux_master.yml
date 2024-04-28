@@ -45,7 +45,7 @@
   shell: |
     # By default, the ingress controller is installed using a Deployment resource. 
     # To use a DaemonSet instead, set the controller.kind field to DaemonSet and controller.daemonset.useHostPort to true or modifiy {{ ingress_haproxy_helmvaluesfile }}.
-    helm install {{ centos_haproxy_helm_chart }} --create-namespace --namespace ingress-controller -f {{ ingress_haproxy_helmvaluesfile }}
+    helm install {{ centos_haproxy_helm_chart }} --create-namespace --namespace {{ centos_haproxy_namespace }} -f {{ ingress_haproxy_helmvaluesfile }}
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
 
 - name: "Remove {{ ingress_haproxy_helmvaluesfile }} from remote host"

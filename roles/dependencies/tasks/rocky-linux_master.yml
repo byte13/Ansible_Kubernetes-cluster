@@ -102,10 +102,25 @@
     state: latest
   when: inventory_hostname in groups['k8smasternodes']
 
+- name: Install the latest version of git
+  become: yes
+  dnf:
+    name: git
+    state: latest
+  when: inventory_hostname in groups['k8smasternodes']
+
+#- name: Install the latest version of helm
+#  become: yes
+#  dnf:
+#    name: helm
+#    state: latest
+#  when: inventory_hostname in groups['k8smasternodes']
+
 - name: "Get script via proxy to install Helm"
+  become: no
   get_url:
     url: "{{ dependencies_helm_URL }}"
-    dest: /tmp
+    dest: "{{ dependencies_helm_script }}"
     force: "yes"
     mode: '0750'
     use_proxy: true
@@ -119,23 +134,35 @@
 #  debug:
 #    var: retval.dest
 
-- name: "Run script to install Helm, then remove script"
+- name: "Run script to install Helm"
+  # Note that the script does sudo commands and that /etc/sudoers should not require a password :-(
+  become: no
   shell: |
-      "{{ retval.dest }}"
-      rm -f {{ retval.dest }}
+      "{{ dependencies_helm_script }}"
+      # "{{ retval.dest }}"
   when: retval.dest is defined and inventory_hostname in groups['k8smasternodes']
 
 - name: "Get script without proxy to install Helm"
+  become: no
   get_url:
     url: "{{ dependencies_helm_URL }}"
-    dest: /tmp
+    dest: "{{ dependencies_helm_script }}"
     force: "yes"
     mode: '0700'
   register: retval 
   when: global_proxy_required != "yes"
 
-- name: "Run script to install Helm, then remove script"
+- name: "Run script to install Helm"
+  # Note that the script does sudo commands and that /etc/sudoers should not require a password :-(
+  become: no
   shell: |
-    "{{ retval.dest }}" 
-    rm -f "{{ retval.dest }}" 
+    "{{ dependencies_helm_script }}"
+    #"{{ retval.dest }}" 
   when: retval.dest is defined and inventory_hostname in groups['k8smasternodes']
+
+- name: "Removing Helm installation script"
+  file:
+    path: "{{ dependencies_helm_script }}"
+    state: absent
+
+

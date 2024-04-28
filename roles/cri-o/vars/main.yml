@@ -59,7 +59,8 @@ centos_crio_repodesc2: "{{centos_crio_reponame2}} ({{centos_crio_osversion}})"
 centos_crio_repobaseurl2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/"
 centos_crio_repogpgkey2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/repodata/repomd.xml.key"
 centos_crio_pkgname: "cri-o"
-centos_critools_pkgname: "cri-tools-{{critools_version}}"
+#centos_critools_pkgname: "cri-tools-{{critools_version}}"
+centos_critools_pkgname: "cri-tools"
 # Next line to define CRI-O system startup environment file
 centos_crio_envfile: "/etc/sysconfig/crio"
 # Next line to define CRI-O system startup file

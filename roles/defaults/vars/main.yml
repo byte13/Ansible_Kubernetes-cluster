@@ -5,14 +5,14 @@
 ######################################################
 # Common variables
 #
-# Requires Kubernetes version
+# Required Kubernetes version
 # Please, ensure both, major and minor version is available with cri-o, too.
 # Both components version must match
 # References:
 #         https://github.com/cri-o/cri-o
 #         https://kubernetes.io/releases/
-global_k8s_version: "1.27"
-global_k8s_minorversion: "1.27.1"
+global_k8s_version: "1.28"
+global_k8s_minorversion: "1.28.1"
 
 # dnf/yum repository for Kubernetes
 global_k8s_reponame1: "kubernetes"
@@ -20,8 +20,8 @@ global_k8s_repodesc1: "Kubernetes repository"
 global_k8s_repobaseurl1: "https://pkgs.k8s.io/core:/stable:/v{{ global_k8s_version }}/rpm/"
 global_k8s_repogpgkey1: "https://pkgs.k8s.io/core:/stable:/v{{ global_k8s_version }}/rpm/repodata/repomd.xml.key"
 
-# Define if it is a re-installation of an running clutser (which requires to reset the cluster)
-global_reset_cluster: "yes"
+# Define if it is a re-installation of an running cluster (which requires to reset the cluster)
+global_reset_cluster: "no"
 
 # Is a proxy used to access Internet (yes/no)
 global_proxy_required: "yes"
