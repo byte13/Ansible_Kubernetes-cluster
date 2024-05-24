@@ -18,7 +18,7 @@ centos_ingress: "haproxy"
 centos_haproxy_reponame: "haproxy-ingress"
 centos_haproxy_helm_repository: "{{centos_haproxy_reponame}} https://haproxy-ingress.github.io/charts"
 centos_haproxy_helm_chart: "{{haproxy-ingress}} {{centos_haproxy_reponame}}/haproxy-ingress"
-centos_haproxy_namespace: "haproxy-controller"
+centos_haproxy_namespace: "haproxy"
 # End of CentOS specific
 ######################################################
 

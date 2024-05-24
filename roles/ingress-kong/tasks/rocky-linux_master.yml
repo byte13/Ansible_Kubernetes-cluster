@@ -25,11 +25,25 @@
     - reload firewalld
   when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_ingress == "kong") and (global_cni != "calico")
 
-- name: Deploy Kong Custom Resources Definitions (CRD)
+- name: Deploy Kubernetes Gateway API Custom Resources Definitions (CRD)
   become: no
   shell: |
-    kubectl apply -f {{ centos_kong_crdurl }}
+    kubectl apply -f {{ centos_gwapi_crdurl }}
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
+
+#- name: Deploy experimental Kubernetes Gateway API Custom Resources Definitions (CRD)
+#  become: no
+#  shell: |
+#    kubectl apply -f {{ centos_gwapi_expcrdurl }}
+#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
+
+# Not sure next one is required but mentionned in
+#     https://medium.com/@martin.hodges/using-kong-to-access-kubernetes-services-using-a-gateway-resource-with-no-cloud-provided-8a1bcd396be9
+#- name: Deploy Kong Gateway API Custom Resources Definitions (CRD)
+#  become: no
+#  shell: |
+#    kubectl apply -k {{ centos_kong_crdurl }}
+#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
 - name: Add Kong controller Helm repository
   become: no
@@ -38,18 +52,18 @@
     helm repo update
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
-#- name: Upload Ingress controller helm chart value file to {{ ingress_kong_helmvaluesfile }} 
-#  become: no
-#  template:
-#    src:   kong-ingress-values.j2 
-#    dest:  "{{ ingress_kong_helmvaluesfile }}"
-#    mode:  0640
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
+- name: Upload Ingress controller helm chart value file to {{ ingress_kong_helmvaluesfile }} 
+  become: no
+  template:
+    src:   kong-ingress-values.j2 
+    dest:  "{{ ingress_kong_helmvaluesfile }}"
+    mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
 - name: Install Kong controller using Helm chart 
   become: no
   shell: |
-    helm install {{ centos_kong_helm_chart }} --create-namespace --namespace {{ centos_kong_namespace }} 
+    helm install {{ centos_kong_helm_chart }} -f {{ ingress_kong_helmvaluesfile }} --create-namespace --namespace {{ centos_kong_namespace }} 
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
 #- name: "Remove {{ ingress_kong_helmvaluesfile }} from remote host"
