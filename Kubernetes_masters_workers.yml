@@ -9,13 +9,14 @@
     - roles/defaults/vars/main.yml 
 
   roles: 
-#  - dependencies
-#  - cri-o
-#  - k8s
-#  - cni
-#  - auditing
+  - dependencies
+  - cri-o
+  - k8s
+  - cni
+  - auditing
+  - gatewayapi-crds
 #  - ingress-haproxy
-  - ingress-kong
+#  - ingress-kong
 #  - admission
 #  - cisbenchmark
 
@@ -30,8 +31,8 @@
     - roles/defaults/vars/main.yml 
 
   roles: 
-#  - dependencies
-#  - cri-o
-#  - k8s
-#  - cni
+  - dependencies
+  - cri-o
+  - k8s
+  - cni
 #  - cisbenchmark

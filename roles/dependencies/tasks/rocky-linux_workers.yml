@@ -95,16 +95,13 @@
     exclude: kubelet
   when: global_upgrade_node == "yes"
 
-- name: Install the latest version of curl
+- name: Install various dependencies 
   become: yes
   dnf:
-    name: curl
+    name: "{{ item }}"
     state: latest
-  when: inventory_hostname in groups['k8sworkernodes']
-
-- name: Install the latest version of udica
-  become: yes
-  dnf:
-    name: udica
-    state: latest
+  loop:
+    - container-selinux
+    - curl
+    - udica
   when: inventory_hostname in groups['k8sworkernodes']

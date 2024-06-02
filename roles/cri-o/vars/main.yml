@@ -5,13 +5,10 @@
 # Common variables
 #
 #
-# CRI-O version to be installed.
-#     Ensure this is the same version than the one of Kubernetes
-#     Available version of Kubernetes and cri-o can be found using :
-#     curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
-#     https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:
-crio_version: "{{ global_k8s_version }}"
+# Easier procedure available on : https://github.com/cri-o/packaging/blob/main/README.md
+crio_version: "v{{ global_k8s_version }}"
 crio_minorversion: "{{ global_k8s_minorversion }}"
+crio_projectpath: "stable:/{{ crio_version }}"
 critools_version: "{{ global_k8s_minorversion }}"
 
 # CRI-O pods subnet
@@ -41,23 +38,40 @@ crio_bridge_configfile: "/etc/cni/net.d/100-crio-bridge.conf"
 # Rocky Linux (CentOS) specific
 #
 
-centos_crio_osversion: "CentOS_8"
+# According to https://github.com/cri-o/packaging/blob/main/README.md
+centos_crio_reponame: "cri-o"
+centos_crio_repodesc: "Stable release of v{{crio_version}}"
+centos_crio_repobaseurl: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/"
+centos_crio_repogpgkey: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/repodata/repomd.xml.key"
 
+#
+# More complex procedure
+# CRI-O version to be installed.
+#     Ensure this is the same version than the one of Kubernetes
+#     Available version of Kubernetes and cri-o can be found using :
+#     curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
+#     https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:
+#centos_crio_osversion: "CentOS_8"
+#
 # CentOS containers libraries repository
 #     To find proper URL's, check https://cri-o.io/ 
 #     Read respective .repo file and copy/paste URL's in respective variables below 
-centos_crio_reponame1: "devel:kubic:libcontainers:stable"
-centos_crio_repodesc1: "Stable Releases of Upstream github.com/containers packages ({{centos_crio_osversion}})"
-centos_crio_repobaseurl1: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{centos_crio_osversion}}/"
-centos_crio_repogpgkey1: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{centos_crio_osversion}}/repodata/repomd.xml.key"
+#centos_crio_reponame1: "devel:kubic:libcontainers:stable"
+#centos_crio_repodesc1: "Stable Releases of Upstream github.com/containers packages ({{centos_crio_osversion}})"
+#centos_crio_repobaseurl1: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{centos_crio_osversion}}/"
+#centos_crio_repogpgkey1: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{centos_crio_osversion}}/repodata/repomd.xml.key"
+
+
 #
 # CRI-O repository for CentOS
 # To find proper URL's, check https://cri-o.io/ 
 # Read respective .repo file and copy/paste URL's in respective variables below 
-centos_crio_reponame2: "devel:kubic:libcontainers:stable:cri-o:{{crio_version}}"
-centos_crio_repodesc2: "{{centos_crio_reponame2}} ({{centos_crio_osversion}})"
-centos_crio_repobaseurl2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/"
-centos_crio_repogpgkey2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/repodata/repomd.xml.key"
+#centos_crio_reponame2: "devel:kubic:libcontainers:stable:cri-o:{{crio_version}}"
+#centos_crio_repodesc2: "{{centos_crio_reponame2}} ({{centos_crio_osversion}})"
+#centos_crio_repobaseurl2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/"
+#centos_crio_repogpgkey2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/repodata/repomd.xml.key"
+
+
 centos_crio_pkgname: "cri-o"
 #centos_critools_pkgname: "cri-tools-{{critools_version}}"
 centos_critools_pkgname: "cri-tools"

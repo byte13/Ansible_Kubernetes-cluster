@@ -35,27 +35,43 @@
   file:
     path: "{{ item }}"
     state: absent
-  with_items:
-  - "/etc/yum.repos.d/{{ centos_crio_reponame1 }}.repo"
-  - "/etc/yum.repos.d/{{ centos_crio_reponame2 }}.repo"
+  loop:
+  - "/etc/yum.repos.d/{{ centos_crio_reponame }}.repo"
 
-- name: Add containers libraries repository {{ centos_crio_repobaseurl1 }} into /etc/yum.repos.d/{{ centos_crio_reponame1 }}.repo
+#- name: Remove current libcontainer and CRI repositories 
+#  file:
+#    path: "{{ item }}"
+#    state: absent
+#  with_items:
+#  - "/etc/yum.repos.d/{{ centos_crio_reponame1 }}.repo"
+#  - "/etc/yum.repos.d/{{ centos_crio_reponame2 }}.repo"
+
+- name: Add containers libraries repository {{ centos_crio_repobaseurl }} into /etc/yum.repos.d/{{ centos_crio_reponame }}.repo
   yum_repository:
-    name: "{{ centos_crio_reponame1 }}"
+    name: "{{ centos_crio_reponame }}"
     state: present
-    description: "{{ centos_crio_repodesc1 }}"
-    baseurl: "{{ centos_crio_repobaseurl1 }}"
-    gpgkey: "{{ centos_crio_repogpgkey1 }}"
+    description: "{{ centos_crio_repodesc }}"
+    baseurl: "{{ centos_crio_repobaseurl }}"
+    gpgkey: "{{ centos_crio_repogpgkey }}"
     gpgcheck: yes
 
-- name: Add CRI-O {{ crio_version }} repository {{ centos_crio_repobaseurl2 }} into /etc/yum.repos.d/{{ centos_crio_reponame2 }}.repo
-  yum_repository:
-    name: "{{ centos_crio_reponame2 }}"
-    state: present
-    description: “{{ centos_crio_repodesc2 }}“
-    baseurl: "{{ centos_crio_repobaseurl2 }}"
-    gpgkey: "{{ centos_crio_repogpgkey2 }}"
-    gpgcheck: yes
+#- name: Add containers libraries repository {{ centos_crio_repobaseurl1 }} into /etc/yum.repos.d/{{ centos_crio_reponame1 }}.repo
+#  yum_repository:
+#    name: "{{ centos_crio_reponame1 }}"
+#    state: present
+#    description: "{{ centos_crio_repodesc1 }}"
+#    baseurl: "{{ centos_crio_repobaseurl1 }}"
+#    gpgkey: "{{ centos_crio_repogpgkey1 }}"
+#    gpgcheck: yes
+
+#- name: Add CRI-O {{ crio_version }} repository {{ centos_crio_repobaseurl2 }} into /etc/yum.repos.d/{{ centos_crio_reponame2 }}.repo
+#  yum_repository:
+#    name: "{{ centos_crio_reponame2 }}"
+#    state: present
+#    description: “{{ centos_crio_repodesc2 }}“
+#    baseurl: "{{ centos_crio_repobaseurl2 }}"
+#    gpgkey: "{{ centos_crio_repogpgkey2 }}"
+#    gpgcheck: yes
 
 # Installation of CRI-O 
 # Notes that Kubernetes repository has bee added in dependencies role; it is required to install crictl

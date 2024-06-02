@@ -95,26 +95,18 @@
     exclude: kubelet
   when: global_upgrade_node == "yes"
 
-- name: Install the latest version of curl
+- name: Install some required utilities 
   become: yes
   dnf:
-    name: curl
+    name: "{{ item }}"
     state: latest
+  loop:
+    - container-selinux
+    - curl
+    - git
+    #- helm
   when: inventory_hostname in groups['k8smasternodes']
 
-- name: Install the latest version of git
-  become: yes
-  dnf:
-    name: git
-    state: latest
-  when: inventory_hostname in groups['k8smasternodes']
-
-#- name: Install the latest version of helm
-#  become: yes
-#  dnf:
-#    name: helm
-#    state: latest
-#  when: inventory_hostname in groups['k8smasternodes']
 
 - name: "Get script via proxy to install Helm"
   become: no
@@ -133,6 +125,12 @@
 #- name: "Display returned value"
 #  debug:
 #    var: retval.dest
+
+- name: Add a line to /etc/sudoers to allow {{ remote_user }} to sudo without password
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    line: "{{ remote_user }} ALL=(ALL)	NOPASSWD: ALL "
+    state: present
 
 - name: "Run script to install Helm"
   # Note that the script does sudo commands and that /etc/sudoers should not require a password :-(
@@ -165,4 +163,9 @@
     path: "{{ dependencies_helm_script }}"
     state: absent
 
+- name: Remove the line to /etc/sudoers to allow {{ remote_user }} to sudo without password
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    line: "{{ remote_user }} ALL=(ALL)	NOPASSWD: ALL "
+    state: absent
 

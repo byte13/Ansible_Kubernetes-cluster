@@ -25,26 +25,6 @@
     - reload firewalld
   when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_ingress == "kong") and (global_cni != "calico")
 
-- name: Deploy Kubernetes Gateway API Custom Resources Definitions (CRD)
-  become: no
-  shell: |
-    kubectl apply -f {{ centos_gwapi_crdurl }}
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
-
-#- name: Deploy experimental Kubernetes Gateway API Custom Resources Definitions (CRD)
-#  become: no
-#  shell: |
-#    kubectl apply -f {{ centos_gwapi_expcrdurl }}
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
-
-# Not sure next one is required but mentionned in
-#     https://medium.com/@martin.hodges/using-kong-to-access-kubernetes-services-using-a-gateway-resource-with-no-cloud-provided-8a1bcd396be9
-#- name: Deploy Kong Gateway API Custom Resources Definitions (CRD)
-#  become: no
-#  shell: |
-#    kubectl apply -k {{ centos_kong_crdurl }}
-#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
-
 - name: Add Kong controller Helm repository
   become: no
   shell: |
@@ -66,8 +46,8 @@
     helm install {{ centos_kong_helm_chart }} -f {{ ingress_kong_helmvaluesfile }} --create-namespace --namespace {{ centos_kong_namespace }} 
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
-#- name: "Remove {{ ingress_kong_helmvaluesfile }} from remote host"
-#  become: no
-#  file:
-#    path: "{{ ingress_kong_helmvaluesfile }}"
-#    state: absent
+- name: "Remove {{ ingress_kong_helmvaluesfile }} from remote host"
+  become: no
+  file:
+    path: "{{ ingress_kong_helmvaluesfile }}"
+    state: absent

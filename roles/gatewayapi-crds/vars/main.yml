@@ -1,0 +1,34 @@
+---
+# vars file for k8s Kong ingress controller 
+#
+######################################################
+# Common variables
+#
+# If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
+ingress_gwapi_version: "1.0.0"
+ingress_display_facts: "{{ global_display_facts }}"
+ingress_kong_helmvaluesfile: "/tmp/kong-ingress-values.yaml"
+#
+# End of common varibles
+######################################################
+######################################################
+# CentOS specific
+#
+centos_ingress: "kong"
+centos_gwapi_crdurl: "https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{ingress_gwapi_version}}/standard-install.yaml"
+centos_gwapi_expcrdurl: "https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{ingress_gwapi_version}}/experimental-install.yaml"
+centos_kong_crdurl: "https://github.com/Kong/kubernetes-ingress-controller/config/crd"
+centos_kong_reponame: "kong"
+centos_kong_helm_repository: "{{centos_kong_reponame}} https://charts.konghq.com"
+centos_kong_helm_chart: "{{centos_kong_reponame}} {{centos_kong_reponame}}/ingress"
+centos_kong_namespace: "kong"
+# End of CentOS specific
+######################################################
+
+######################################################
+# Ubuntu specific
+#
+#
+# End of Ubuntu specific
+######################################################
+

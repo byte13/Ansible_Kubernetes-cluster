@@ -11,8 +11,8 @@
 # References:
 #         https://github.com/cri-o/cri-o
 #         https://kubernetes.io/releases/
-global_k8s_version: "1.28"
-global_k8s_minorversion: "1.28.1"
+global_k8s_version: "1.30"
+global_k8s_minorversion: "1.30.1"
 
 # dnf/yum repository for Kubernetes
 global_k8s_reponame1: "kubernetes"
@@ -42,6 +42,10 @@ global_upgrade_node:   "yes"
 # Choose CNI type. Could be : calico, antrea, weave.
 # Calico, only, is fully tested, yet
 global_cni:            "calico"
+
+# Define if Gateway API CRD's and experimental CRD's must be installed
+global_install_gwapicrds:    "yes"
+global_install_expgwapicrds: "no"
 
 #
 # End of common varibles
