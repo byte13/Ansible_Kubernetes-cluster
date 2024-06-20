@@ -5,7 +5,7 @@
 # Common variables
 #
 # If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
-ingress_gwapi_version: "1.0.0"
+ingress_gwapi_version: "1.1.0"
 ingress_display_facts: "{{ global_display_facts }}"
 ingress_kong_helmvaluesfile: "/tmp/kong-ingress-values.yaml"
 #

@@ -16,7 +16,7 @@
   - auditing
   - gatewayapi-crds
 #  - ingress-haproxy
-#  - ingress-kong
+  - ingress-kong
 #  - admission
 #  - cisbenchmark
 
