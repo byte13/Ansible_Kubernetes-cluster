@@ -65,8 +65,8 @@ k8s_helm_URL: "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm
 centos_selinux: "yes"
 
 # Define if selinux state must be "enforcing", "permissive" or "disabled" after cluster activation
-centos_selinux_state: "enforcing"
-#centos_selinux_state: "permissive"
+#centos_selinux_state: "enforcing"
+centos_selinux_state: "permissive"
 
 # yum repository for Kubernetes
 centos_k8s_reponame1: "{{ global_k8s_reponame1 }}"
