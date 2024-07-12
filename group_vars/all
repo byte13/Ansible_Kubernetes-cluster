@@ -1,0 +1,58 @@
+---
+# vars file for global variables Rocky-Linux/Centos/Redhat
+# Some of those variables are referenced in tasks or in other roles/<role>/vars/main.yaml
+#
+######################################################
+# Common variables
+#
+# User and become variables
+become: false
+remote_user: user1
+become_user: root
+
+# Required Kubernetes version
+# Please, ensure both, major and minor version is available with cri-o, too.
+# Both components version must match
+# References:
+#         https://github.com/cri-o/cri-o
+#         https://kubernetes.io/releases/
+global_k8s_version: "1.30"
+global_k8s_minorversion: "1.30.1"
+
+# dnf/yum repository for Kubernetes
+global_k8s_reponame1: "kubernetes"
+global_k8s_repodesc1: "Kubernetes repository"
+global_k8s_repobaseurl1: "https://pkgs.k8s.io/core:/stable:/v{{ global_k8s_version }}/rpm/"
+global_k8s_repogpgkey1: "https://pkgs.k8s.io/core:/stable:/v{{ global_k8s_version }}/rpm/repodata/repomd.xml.key"
+
+# Define if it is a re-installation of an running cluster (which requires to reset the cluster)
+global_reset_cluster: "no"
+
+# Is a proxy used to access Internet (yes/no)
+global_proxy_required: "yes"
+# Respective proxy variables to be adjusted to your context
+global_proxy_profile:  "/etc/profile.d/http_proxy.sh"
+global_proxy_ip:       "10.13.4.254"
+global_proxy_port:     "3128"
+global_http_proxy:     "http://{{global_proxy_ip}}:{{global_proxy_port}}"
+global_https_proxy:    "http://{{global_proxy_ip}}:{{global_proxy_port}}"
+global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+
+# Define if you want to display facts during playbook run
+global_display_facts:  "no"
+
+# Define if the hosts operating system must be updated
+global_upgrade_node:   "yes"
+
+# Choose CNI type. Could be : calico, antrea, weave.
+# Calico, only, is fully tested, yet
+global_cni:            "calico"
+
+# Define if Gateway API CRD's and experimental CRD's must be installed
+global_install_gwapicrds:    "yes"
+global_install_expgwapicrds: "no"
+
+#
+# End of common varibles
+######################################################
+

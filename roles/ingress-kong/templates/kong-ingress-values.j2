@@ -13,15 +13,17 @@ gateway:
     http:
       enabled: true
       nodePort: 32080
-    https:
-      enabled: true
-      nodePort: 32443
+    #https:
+    #  enabled: true
+    #  nodePort: 32443
     tls:
       enabled: true
+      nodePort: 32443
 svc:
   # To determine how ip-restriction plugin behaves.
   # Local means : filter on external IP's instead of Cluster ones
-  externalTrafficPolicy: Local
+  spec:
+    externalTrafficPolicy: Local
 
 #  ingressController:
 #    env:

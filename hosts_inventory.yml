@@ -1,9 +1,10 @@
 all:
 
-  vars:
-    become: false
-    remote_user: user1 
-    become_user: root 
+# Following variables sets in group_vars/all, too
+#  vars:
+#    become: false
+#    remote_user: user1 
+#    become_user: root 
 
   hosts:
   children:

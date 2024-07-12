@@ -6,8 +6,8 @@ So there are variables specific to each OS.
 Fully tested using :
 * Ansible 2.10.8 on Ubuntu 22.04 LTS
 * Rocky-linux 9.2 as Kubernetes cluster nodes (so it should work on CentOS 9 and RedHat 9 as well)
-* CRI-O 1.24 as container runtime
-* Kubernetes 1.27
+* CRI-O 1.30 as container runtime
+* Kubernetes 1.30
 * Calico as Container Network Interface (CNI), but ready soon to install Antrea, Cilium or Weave instead (see roles/cni/README.md)
 * HAproxy as ingress controller
 
@@ -29,7 +29,7 @@ Fully tested using :
 ```
     $ vi hosts_inventory.yml 
 ``` 
-6. Follow the instructions in each roles/\<role\>/README.md file, aspecially in roles/defaults/vars/main.yaml
+6. Follow the instructions in goup_vars/all and in each roles/\<role\>/README.md file
 
 7. To manage selinux, Ansible requires the installation of a module using the following command :
 ```
