@@ -1,5 +1,5 @@
 ---
-# tasks file  to deply Keycloak
+# tasks file for keycloak
 # Create directory on target node to contain Keycloak persistent definitions 
 - name: Create {{ centos_keycloak_hostpath }} directory on target node
   file:

@@ -1,0 +1,12 @@
+---
+# tasks file for gitops
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: gitops_display_facts == "yes"
+
+##################
+# ArgoCD specific
+##################
+

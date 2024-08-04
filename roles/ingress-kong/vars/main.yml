@@ -1,5 +1,5 @@
 ---
-# vars file for k8s Kong ingress controller 
+# vars file for ingress-kong 
 #
 ######################################################
 # Common variables

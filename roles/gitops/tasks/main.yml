@@ -1,5 +1,5 @@
 ---
-# tasks file for ingress-kong 
+# tasks file for  gitops 
 # Import Linux distribution specific playbooks
 - name: Install ingress controller on RedHat 
   import_tasks: rocky-linux_master.yml

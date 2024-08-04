@@ -1,0 +1,51 @@
+---
+# tasks file for gitops 
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: gitops_display_facts == "yes"
+
+##################
+# ArgoCD specific
+##################
+
+- name: Retrieve {{ centos_gitops }} Kubernetes manifest into {{ centos_gitops_manifestfile }}
+  become: no
+  shell: |
+    curl -fsSL -o {{ centos_gitops_manifestfile }} {{ centos_argocd_URL }}
+    chmod 640 {{ centos_gitops_manifestfile }}
+    chown user1:user1 {{ centos_gitops_manifestfile }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_gitops == "yes") and (centos_gitops == "argocd")
+
+- name: Upload k8s manifest file to create {{ centos_argocd_namespace }} namespace
+  template:
+    src:   namespace_gitops.yaml.j2
+    dest:  "{{ centos_namespace_manifestfile }}"
+    owner: user1
+    group: user1
+    mode:  0640
+
+- name: Create {{ centos_argocd_namespace }} namespace 
+  become: no
+  shell: |
+    kubectl apply -f {{ centos_namespace_manifestfile }} 
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_gitops == "yes") and (centos_gitops == "argocd")
+
+- name: "Remove {{ centos_namespace_manifestfile }} from remote host"
+  become: no
+  file:
+    path: "{{ centos_namespace_manifestfile }}"
+    state: absent
+
+- name: Deploy {{ centos_gitops }} GitOps components 
+  become: no
+  shell: |
+    kubectl apply -f {{ centos_gitops_manifestfile }} -n {{ centos_argocd_namespace }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_gitops == "yes") and (centos_gitops == "argocd")
+
+- name: Remove {{ centos_gitops_localmanifestfile }} from remote host
+  become: no
+  file:
+    path: "{{ centos_gitops_manifestfile }}"
+    state: absent

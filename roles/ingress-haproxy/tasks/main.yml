@@ -1,5 +1,5 @@
 ---
-# tasks file for k8s 
+# tasks file for ingress-haproxy 
 # Import Linux distribution specific playbooks
 - name: Install ingress controller on RedHat 
   import_tasks: rocky-linux_master.yml

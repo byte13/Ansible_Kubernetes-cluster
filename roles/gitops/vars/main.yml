@@ -1,20 +1,22 @@
 ---
-# vars file for k8s gatewayapi-crds 
+# vars file for k8s GitOps component 
 #
 ######################################################
 # Common variables
 #
 # If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
-ingress_gwapi_version: "v1.1.0"
-ingress_display_facts: "{{ global_display_facts }}"
+gitops_display_facts: "{{ global_display_facts }}"
+centos_gitops: "argocd"
+centos_gitops_manifestfile: /tmp/{{ centos_gitops }}_install.yaml
 #
 # End of common varibles
 ######################################################
 ######################################################
 # CentOS specific
 #
-centos_gwapi_crdurl: "https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ingress_gwapi_version}}/standard-install.yaml"
-centos_gwapi_expcrdurl: "https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ingress_gwapi_version}}/experimental-install.yaml"
+centos_argocd_namespace: "{{centos_gitops}}"
+centos_namespace_manifestfile: "/tmp/namespace_gitops.yaml"
+centos_argocd_URL: "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
 # End of CentOS specific
 ######################################################
 
@@ -24,4 +26,3 @@ centos_gwapi_expcrdurl: "https://github.com/kubernetes-sigs/gateway-api/releases
 #
 # End of Ubuntu specific
 ######################################################
-

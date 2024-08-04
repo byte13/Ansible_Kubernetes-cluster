@@ -1,5 +1,0 @@
----
-# vars file for global variables Rocky-Linux/Centos/Redhat
-# Some of those variables are referenced in tasks or in other roles/<role>/vars/main.yaml
-# Variables moved to group_vars/all
-

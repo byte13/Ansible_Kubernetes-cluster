@@ -6,7 +6,7 @@
 #
 #
 # Easier procedure available on : https://github.com/cri-o/packaging/blob/main/README.md
-crio_version: "v{{ global_k8s_version }}"
+crio_version: "{{ global_k8s_version }}"
 crio_minorversion: "{{ global_k8s_minorversion }}"
 crio_projectpath: "stable:/{{ crio_version }}"
 critools_version: "{{ global_k8s_minorversion }}"
@@ -40,7 +40,7 @@ crio_bridge_configfile: "/etc/cni/net.d/100-crio-bridge.conf"
 
 # According to https://github.com/cri-o/packaging/blob/main/README.md
 centos_crio_reponame: "cri-o"
-centos_crio_repodesc: "Stable release of v{{crio_version}}"
+centos_crio_repodesc: "Stable release of {{crio_version}}"
 centos_crio_repobaseurl: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/"
 centos_crio_repogpgkey: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/repodata/repomd.xml.key"
 

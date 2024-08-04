@@ -1,5 +1,5 @@
 ---
-# handlers file for ingress 
+# handlers file for ingress-haproxy
 - name: reload firewalld
   systemd:
     name: firewalld

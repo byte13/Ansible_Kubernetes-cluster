@@ -1,5 +1,2 @@
 ---
-# handlers file to restart the Kubernetes API server
-- name restart apiserver
-  become: no
-  shell: kubectl delete pod/kube-apiserver-master-k8s -n kube-system
+# handlers file for keycloak 
