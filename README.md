@@ -52,14 +52,16 @@ Fully tested using :
 ## Directory structure :
 ```
 .
+├── group_vars
+│   └── all
 ├── hosts_inventory.yml
 ├── Kubernetes_masters_workers.yml
+├── LICENSE
 ├── README.md
 └── roles
     ├── auditing
     │   ├── defaults
     │   │   └── main.yml
-    │   ├── files
     │   ├── handlers
     │   │   └── main.yml
     │   ├── meta
@@ -68,7 +70,7 @@ Fully tested using :
     │   ├── tasks
     │   │   └── main.yml
     │   ├── templates
-    │   │   └── B13_K8S_Audit-Policy_simple.j2
+    │   │   └── K8S_Audit-Policy_simple.j2
     │   ├── tests
     │   │   ├── inventory
     │   │   └── test.yml
@@ -77,7 +79,6 @@ Fully tested using :
     ├── cni
     │   ├── defaults
     │   │   └── main.yml
-    │   ├── files
     │   ├── handlers
     │   │   └── main.yml
     │   ├── meta
@@ -86,11 +87,11 @@ Fully tested using :
     │   ├── tasks
     │   │   ├── main.yml
     │   │   ├── rocky-linux_master.yml
-    │   │   ├── rocky-linux_workers.yml
-    │   │   └── ubuntu_master.yml
+    │   │   └── rocky-linux_workers.yml
     │   ├── templates
+    │   │   ├── calico.conf.j2
     │   │   ├── calico_crd.j2
-    │   │   └── calico_IPPools.j2
+    │   │   └── calico_ippools.j2
     │   ├── tests
     │   │   ├── inventory
     │   │   └── test.yml
@@ -99,7 +100,6 @@ Fully tested using :
     ├── cri-o
     │   ├── defaults
     │   │   └── main.yml
-    │   ├── files
     │   ├── handlers
     │   │   └── main.yml
     │   ├── meta
@@ -107,8 +107,7 @@ Fully tested using :
     │   ├── README.md
     │   ├── tasks
     │   │   ├── main.yml
-    │   │   ├── rocky-linux.yml
-    │   │   └── ubuntu.yml
+    │   │   └── rocky-linux.yml
     │   ├── templates
     │   │   ├── 100-crio-bridge.conf.j2
     │   │   ├── crio.conf.j2
@@ -118,7 +117,7 @@ Fully tested using :
     │   │   └── test.yml
     │   └── vars
     │       └── main.yml
-    ├── ingress
+    ├── dependencies
     │   ├── defaults
     │   │   └── main.yml
     │   ├── files
@@ -130,32 +129,136 @@ Fully tested using :
     │   ├── tasks
     │   │   ├── main.yml
     │   │   ├── rocky-linux_master.yml
-    │   │   ├── rocky-linux_workers.yml
-    │   │   └── ubuntu_master.yml
+    │   │   └── rocky-linux_workers.yml
     │   ├── templates
     │   ├── tests
     │   │   ├── inventory
     │   │   └── test.yml
     │   └── vars
     │       └── main.yml
-    └── k8s
+    ├── gatewayapi-crds
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   ├── main.yml
+    │   │   ├── rocky-linux_master.yml
+    │   │   └── rocky-linux_workers.yml
+    │   ├── templates
+    │   │   └── kong-ingress-values.j2
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    ├── gitops
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   ├── main.yml
+    │   │   ├── rocky-linux_master.yml
+    │   │   └── rocky-linux_workers.yml
+    │   ├── templates
+    │   │   └── namespace_gitops.yaml.j2
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    ├── ingress-haproxy
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   ├── main.yml
+    │   │   ├── rocky-linux_master.yml
+    │   │   └── rocky-linux_workers.yml
+    │   ├── templates
+    │   │   └── haproxy-ingress-values.j2
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    ├── ingress-kong
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   ├── main.yml
+    │   │   ├── rocky-linux_master.yml
+    │   │   └── rocky-linux_workers.yml
+    │   ├── templates
+    │   │   └── kong-ingress-values.j2
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    ├── k8s
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   ├── main.yml
+    │   │   ├── rocky-linux_master.yml
+    │   │   └── rocky-linux_workers.yml
+    │   ├── templates
+    │   │   ├── cluster-kubelet-config.j2
+    │   │   └── kubelet.j2
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    ├── keycloak
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   └── main.yml
+    │   ├── templates
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    └── oidc
         ├── defaults
         │   └── main.yml
-        ├── files
         ├── handlers
         │   └── main.yml
         ├── meta
         │   └── main.yml
         ├── README.md
         ├── tasks
-        │   ├── main.yml
-        │   ├── rocky-linux_master.yml
-        │   ├── rocky-linux_workers.yml
-        │   ├── ubuntu_master.yml
-        │   └── ubuntu_workers.yml
+        │   └── main.yml
         ├── templates
-        │   ├── cluster-kubelet-config.j2
-        │   └── kubelet.j2
         ├── tests
         │   ├── inventory
         │   └── test.yml
