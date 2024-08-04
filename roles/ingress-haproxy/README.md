@@ -3,11 +3,12 @@ This Ansible role installs HAproxy as Kubernetes ingress controller
 
 Fully tested using :
 * Ansible 2.10.8 on Ubuntu 22.04 LTS
-* Rocky-linux 8 as Kubernetes cluster nodes (should work on CentOS 8 and RedHat 8 as well)
-* CRI-O 1.27 as container runtime
+* Rocky-linux 9 as Kubernetes cluster nodes (should work on CentOS 9 and RedHat 9 as well)
+* Kubernetes 1.30 as destination cluster 
+* CRI-O 1.30 as container runtime
 
 ## Main steps to execute this Ansible playbook :
-1. Possibly adjust variables in role/ingress/var/main.yml (check comments in the file to understand effect of respective variables)
+1. Possibly adjust variables in role/ingress-haproxy/var/main.yml (check comments in the file to understand effect of respective variables)
    
 ## Directory structure :
 ```

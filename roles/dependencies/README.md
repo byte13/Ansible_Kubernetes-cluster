@@ -1,5 +1,5 @@
-# HA proxy ingress controler 
-This Ansible role installs HAproxy as Kubernetes ingress controller 
+# Dependencies 
+This Ansible role installs Kubernetes depedencies 
 
 ## Main steps to execute this Ansible playbook :
 1. Possibly adjust variables in roles/dependencies/vars/main.yml (check comments in the file to understand effect of respective variables)

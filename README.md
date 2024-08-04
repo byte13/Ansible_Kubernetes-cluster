@@ -10,6 +10,7 @@ Fully tested using :
 * Kubernetes 1.30
 * Calico as Container Network Interface (CNI), but ready soon to install Antrea, Cilium or Weave instead (see roles/cni/README.md)
 * HAproxy as ingress controller
+* Kong as ingress controller
 
 ## Main steps to execute this Ansible playbook :
 1. On each target system, ensure you have an account allowed to sudo ALL with password
