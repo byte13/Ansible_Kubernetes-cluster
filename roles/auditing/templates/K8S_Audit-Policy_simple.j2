@@ -1,10 +1,37 @@
 apiVersion: audit.k8s.io/v1
 kind: Policy
+
 rules:
+  #- level: None
   # Log kubernetes-admin (default admin created by kubeadm) activities at metdata level
-  - level: Metadata
+  #- level: Metadata
   #  users:
   #  - kubernetes-admin
+
+  # Log some Kubernetes administrators activities
+  - level: Metadata
+    userGroups:
+    - kubeadm:cluster-admins 
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - patch
+    - update
+    resources:
+    - group: "" # core API group
+
+  # Log Kubernetes access to secrets 
+  - level: Metadata
+    resources:
+    - group: "" # core API group
+      resources: ["secrets"]
+
+  # Log Kubernetes access to secrets 
+  - level: Metadata
+    resources:
+    - group: "" # core API group
+      resources: ["secrets"]
 
   # Logs activities related to a given list of groups of users
   - level: Metadata
@@ -23,22 +50,24 @@ rules:
   #  - janeinfra2
   #  - bobdev2
 
-  # Do not log from kube-system accounts
+  # Do not log legitime system accounts activities
   - level: None
     userGroups:
     - system:serviceaccounts:kube-system
+    - system:serviceaccounts:argocd
+    - system:serviceaccount:collectorforkubernetes:collectorforkubernetes
+
   - level: None
     users:
     - system:apiserver
     - system:kube-scheduler
     - system:volume-scheduler
     - system:kube-controller-manager
-    - system:node
+    - kubernetes-admin 
 
-  # Do not log from collector nor from ingress-controller
+  # Do not log from from ingress-controller
   - level: None
     users:
-    - system:serviceaccount:collectorforkubernetes:collectorforkubernetes
     - system:serviceaccount:ingress-controller:haproxy-ingress
 
   # Don't log nodes communications
@@ -59,5 +88,8 @@ rules:
     - /swagger*
 
   # Log everything else at Metadata level
-  - level: Metadata
+  #- level: Metadata
+
+  # Log nothing else
+  - level: None
 
