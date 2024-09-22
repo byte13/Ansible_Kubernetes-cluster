@@ -10,7 +10,7 @@
 # Kong specific
 ##################
 
-- name: Set firewall rules for Keycloak trafics on CentOS/Redhat/Rock-Linux
+- name: Set firewall rules for Kong ingress trafics on CentOS/Redhat/Rock-Linux
   firewalld:
     zone: public
     port: "{{ item }}"
@@ -28,7 +28,7 @@
 - name: Add Kong controller Helm repository
   become: no
   shell: |
-    helm repo add {{ centos_kong_helm_repository }}
+    helm repo add {{ centos_kong_reponame }} {{ centos_kong_helm_repository }}
     helm repo update
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 

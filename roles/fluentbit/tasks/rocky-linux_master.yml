@@ -1,0 +1,34 @@
+---
+# Tasks file for Fluentbit 
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: fluentbit_display_facts == "yes"
+
+- name: Add Fluentbit Helm repository
+  become: no
+  shell: |
+    helm repo add {{ centos_fluentbit_reponame }} {{ centos_fluentbit_helm_repourl }}
+    helm repo update
+  when: (inventory_hostname in groups['k8smasternodes'])
+
+#- name: Upload Fluentbit helm chart value file to {{ fluentbit_helmvaluesfile }} 
+#  become: no
+#  template:
+#    src:   fluentbit-values.j2
+#    dest:  "{{ fluentbit_helmvaluesfile }}"
+#    mode:  0640
+#  when: (inventory_hostname in groups['k8smasternodes'])
+
+- name: Install Fluentbit using Helm chart 
+  become: no
+  shell: |
+    helm upgrade --install {{ centos_fluentbit_helm_chart }} --create-namespace --namespace {{ centos_fluentbit_namespace }} -f {{ fluentbit_helmvaluesfile }}
+  when: (inventory_hostname in groups['k8smasternodes'])
+
+#- name: "Remove {{ fluentbit_helmvaluesfile }} from remote host"
+#  become: no
+#  file:
+#    path: "{{ fluentbit_helmvaluesfile }}"
+#    state: absent

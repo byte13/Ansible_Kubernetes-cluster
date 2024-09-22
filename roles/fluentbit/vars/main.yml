@@ -1,0 +1,22 @@
+---
+# vars file for k8s Fluentbit 
+#
+######################################################
+# Common variables
+#
+# If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
+fluentbit_display_facts: "{{ global_display_facts }}"
+fluentbit_helmvaluesfile: "/tmp/fluentbit-values.yaml"
+#
+# End of common varibles
+######################################################
+######################################################
+# CentOS specific
+#
+centos_fluentbit_reponame: "fluent"
+centos_fluentbit_helm_repourl: "https://fluent.github.io/helm-charts"
+centos_fluentbit_helm_chart: "fluent-bit {{centos_fluentbit_reponame}}/fluent-bit"
+centos_fluentbit_namespace: "fluent-bit"
+# End of CentOS specific
+######################################################
+

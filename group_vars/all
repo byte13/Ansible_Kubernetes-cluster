@@ -55,6 +55,8 @@ global_install_expgwapicrds: "no"
 # Define if GitOps solutions should be deployed in the cluster
 global_gitops: "no"
 
+# Define OpenSearch master server FQDN
+global_opensearch-master_fqdn: "winux4100.lab.byte13.org"
 #
 # End of common varibles
 ######################################################

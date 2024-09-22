@@ -10,7 +10,7 @@
 # HAproxy specific
 ##################
 
-- name: Set firewall rules for Keycloak trafics on CentOS/Redhat/Rock-Linux
+- name: Set firewall rules for HAproxy trafics on CentOS/Redhat/Rock-Linux
   firewalld:
     zone: public
     port: "{{ item }}"
@@ -28,7 +28,7 @@
 - name: Add HAproxy controller Helm repository
   become: no
   shell: |
-    helm repo add {{ centos_haproxy_helm_repository }}
+    helm repo add {{ centos_haproxy_reponame }} {{ centos_haproxy_helm_repository }}
     helm repo update
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
 

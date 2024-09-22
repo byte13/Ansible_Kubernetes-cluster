@@ -19,7 +19,7 @@ centos_gwapi_crdurl: "https://github.com/kubernetes-sigs/gateway-api/releases/do
 centos_gwapi_expcrdurl: "https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{ingress_gwapi_version}}/experimental-install.yaml"
 centos_kong_crdurl: "https://github.com/Kong/kubernetes-ingress-controller/config/crd"
 centos_kong_reponame: "kong"
-centos_kong_helm_repository: "{{centos_kong_reponame}} https://charts.konghq.com"
+centos_kong_helm_repository: "https://charts.konghq.com"
 centos_kong_helm_chart: "{{centos_kong_reponame}} {{centos_kong_reponame}}/ingress"
 centos_kong_namespace: "kong"
 # End of CentOS specific
