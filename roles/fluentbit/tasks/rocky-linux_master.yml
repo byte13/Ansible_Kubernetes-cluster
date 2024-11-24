@@ -24,7 +24,8 @@
 - name: Install Fluentbit using Helm chart 
   become: no
   shell: |
-    helm upgrade --install {{ centos_fluentbit_helm_chart }} --create-namespace --namespace {{ centos_fluentbit_namespace }} -f {{ fluentbit_helmvaluesfile }}
+    helm upgrade --install {{ centos_fluentbit_helm_chart }} --create-namespace --namespace {{ centos_fluentbit_namespace }}
+#    helm upgrade --install {{ centos_fluentbit_helm_chart }} --create-namespace --namespace {{ centos_fluentbit_namespace }} -f {{ fluentbit_helmvaluesfile }}
   when: (inventory_hostname in groups['k8smasternodes'])
 
 #- name: "Remove {{ fluentbit_helmvaluesfile }} from remote host"

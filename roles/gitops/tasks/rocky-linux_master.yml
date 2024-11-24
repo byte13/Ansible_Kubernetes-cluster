@@ -25,6 +25,7 @@
     owner: user1
     group: user1
     mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_gitops == "yes") and (centos_gitops == "argocd")
 
 - name: Create {{ centos_argocd_namespace }} namespace 
   become: no
@@ -37,6 +38,7 @@
   file:
     path: "{{ centos_namespace_manifestfile }}"
     state: absent
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_gitops == "yes") and (centos_gitops == "argocd")
 
 - name: Deploy {{ centos_gitops }} GitOps components 
   become: no
@@ -49,3 +51,4 @@
   file:
     path: "{{ centos_gitops_manifestfile }}"
     state: absent
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_gitops == "yes") and (centos_gitops == "argocd")

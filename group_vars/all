@@ -16,8 +16,8 @@ become_user: root
 # References:
 #         https://github.com/cri-o/cri-o
 #         https://kubernetes.io/releases/
-global_k8s_version: "v1.30"
-global_k8s_minorversion: "1.30.1"
+global_k8s_version: "v1.31"
+global_k8s_minorversion: "1.31.1"
 
 # dnf/yum repository for Kubernetes
 global_k8s_reponame1: "kubernetes"
@@ -53,10 +53,10 @@ global_install_gwapicrds:    "yes"
 global_install_expgwapicrds: "no"
 
 # Define if GitOps solutions should be deployed in the cluster
-global_gitops: "no"
+global_gitops: "yes"
 
 # Define OpenSearch master server FQDN
-global_opensearch-master_fqdn: "winux4100.lab.byte13.org"
+global_opensearchMaster_fqdn: "winux4100.lab.byte13.org"
 #
 # End of common varibles
 ######################################################

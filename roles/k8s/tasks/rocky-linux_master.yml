@@ -56,7 +56,8 @@
 - name: "Disable memory swapping to disk in fstab since kubernetes cannot work with swap enabled"
   replace:
     path: /etc/fstab
-    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    #regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    regexp: '^(\/dev\/mapper\/rl-swap)'
     replace: '# \1'
   when: ansible_facts['os_family']|lower == 'redhat'
 
@@ -98,6 +99,7 @@
 - name: "Uninstall Kubernetes packages: {{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}, {{ centos_kubectl_pkgname }}"
   dnf:
     name:
+      - "{{ centos_critools_pkgname }}"
       - "{{ centos_kubeadm_pkgname }}"
       - "{{ centos_kubelet_pkgname }}"
       - "{{ centos_kubectl_pkgname }}"
@@ -115,13 +117,13 @@
   when: k8s_reset_cluster == "yes"
 
 # Note that Kubernetes dnf/yum repository has been added by dependencies role
-# crictl has been install by cri-o role
 # crictl is a CLI by Kubernetes to interact with installed CRI; it is required to deploy Kubernetes with kubeadm
 - name: "Install Kubernetes packages: {{ centos_tc_pkgname }}, {{ centos_nettools_pkgname }},{{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}, {{ centos_kubectl_pkgname }}"
   dnf:
     name:
       - "{{ centos_tc_pkgname }}"
       - "{{ centos_nettools_pkgname }}"
+      - "{{ centos_critools_pkgname }}"
       - "{{ centos_kubeadm_pkgname }}-{{ k8s_version }}"
       - "{{ centos_kubelet_pkgname }}-{{ k8s_version }}"
       - "{{ centos_kubectl_pkgname }}-{{ k8s_version }}"
@@ -155,13 +157,23 @@
   notify:
     - reload systemd
  
-- name: Initialize Kubernetes cluster using kubeadm 
+- name: Initialize Kubernetes cluster using kubeadm
   command: kubeadm init --apiserver-advertise-address={{ k8s_apiserver_advip }} \
                         --service-cidr={{ k8s_services_subnet }} \
-                        --pod-network-cidr={{ k8s_pods_subnet }}
+                        --pod-network-cidr={{ k8s_pods_subnet }} \
+                        --upload-certs
                         #--cri-socket=/var/run/crio/crio.sock
   #command: kubeadm init --config={{ k8s_cluster_kubelet_configfile }}
+  register: kubernetes_kubeadminit_output
   when: inventory_hostname in groups['k8smasternodes']
+
+#- debug:
+#  msg: "{{ kubernetes_join_worker_command.stdout }}"
+- name: "Save kubeadm init output in local {{ k8s_join_dir }}/{{ inventory_hostname }}_{{ k8s_kubeadminit_outputfile }}"
+  become: no
+  local_action:
+    copy content="{{ kubernetes_kubeadminit_output }}" dest="{{ k8s_join_dir }}/{{ inventory_hostname }}_{{ k8s_kubeadminit_outputfile }}" mode="0600"
+  when: inventory_hostname in groups['k8smasternodes'] 
 
 - name: "Create ~{{ remote_user }}/.kube directory on target node"
   file:
@@ -216,6 +228,16 @@
     name: kubelet 
     state: restarted
     enabled: yes
+
+- name: "Wait for k8s master node(s) to be ready..."
+  become: no
+  shell: kubectl wait --for=condition=Ready nodes --selector node-role.kubernetes.io/control-plane="" --timeout=180s
+  register: masternodes_ready
+
+- name: "Wait for all pods on k8s master node(s) to be ready..."
+  become: no
+  shell: kubectl wait pods --all -n kube-system --for condition=Ready --timeout=600s 
+  register: masternodes_pods_ready
 
 - name: "Set selinux back to mode defined in centos_selinux_state variable in role/k8s/vars/main.yml (current value : {{ centos_selinux_state }})"
   ansible.posix.selinux:

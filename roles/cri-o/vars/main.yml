@@ -9,7 +9,7 @@
 crio_version: "{{ global_k8s_version }}"
 crio_minorversion: "{{ global_k8s_minorversion }}"
 crio_projectpath: "stable:/{{ crio_version }}"
-critools_version: "{{ global_k8s_minorversion }}"
+#critools_version: "{{ global_k8s_minorversion }}"
 
 # CRI-O pods subnet
 #     Ensure chosen subnet doesn't conflict with enterprise subnet that pods should connect to.
@@ -43,6 +43,7 @@ centos_crio_reponame: "cri-o"
 centos_crio_repodesc: "Stable release of {{crio_version}}"
 centos_crio_repobaseurl: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/"
 centos_crio_repogpgkey: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/repodata/repomd.xml.key"
+centos_crio_pkgname: "cri-o"
 
 #
 # More complex procedure
@@ -72,13 +73,12 @@ centos_crio_repogpgkey: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath 
 #centos_crio_repogpgkey2: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{centos_crio_osversion}}/repodata/repomd.xml.key"
 
 
-centos_crio_pkgname: "cri-o"
 #centos_critools_pkgname: "cri-tools-{{critools_version}}"
-centos_critools_pkgname: "cri-tools"
+#centos_critools_pkgname: "cri-tools"
 # Next line to define CRI-O system startup environment file
-centos_crio_envfile: "/etc/sysconfig/crio"
+#centos_crio_envfile: "/etc/sysconfig/crio"
 # Next line to define CRI-O system startup file
-centos_crio_startupfile: "/usr/lib/systemd/system/crio.service"
+#centos_crio_startupfile: "/usr/lib/systemd/system/crio.service"
 #
 # End of CentOS specific
 ######################################################

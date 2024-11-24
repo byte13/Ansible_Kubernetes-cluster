@@ -5,17 +5,17 @@
   become_user: root
 
   roles: 
-#  - dependencies
-#  - cri-o
-#  - k8s
-#  - cni
-#  - auditing
+  - dependencies
+  - cri-o
+  - k8s
+  - cni
+  - auditing
 #  - gatewayapi-crds
 #  - ingress-haproxy
 #  - ingress-kong
 #  - admission
 #  - gitops
-  - fluentbit
+#  - fluentbit
 #  - cisbenchmark
 
 - hosts: k8sworkernodes 
@@ -25,8 +25,8 @@
   become_user: root
 
   roles: 
-#  - dependencies
-#  - cri-o
-#  - k8s
-#  - cni
+  - dependencies
+  - cri-o
+  - k8s
+  - cni
 #  - cisbenchmark

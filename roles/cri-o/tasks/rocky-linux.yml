@@ -74,13 +74,10 @@
 #    gpgcheck: yes
 
 # Installation of CRI-O 
-# Notes that Kubernetes repository has bee added in dependencies role; it is required to install crictl
-# crictl is a CLI by Kubernetes to interact with installed CRI; it is required to deploy Kubernetes with kubeadm
-- name: "Install CRI-O {{ crio_version }} packages: {{ centos_crio_pkgname }}, {{ centos_critools_pkgname }}"
+- name: "Install CRI-O {{ crio_version }} packages: {{ centos_crio_pkgname }}"
   dnf:
     name:
       - "{{ centos_crio_pkgname }}"
-      - "{{ centos_critools_pkgname }}"
     state: present
     update_cache: yes
   notify:

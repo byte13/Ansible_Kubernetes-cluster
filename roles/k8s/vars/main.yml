@@ -45,7 +45,7 @@ k8s_kubelet_extraargs_destfile: "/etc/default/kubelet"
 # Local directory and files containing the command to be run on worker nodes to join the cluster
 k8s_join_dir: "/B13/IAC/ANSIBLE/Ansible_Kubernetes-cluster"
 
-#k8s_join_master_file: "k8s_masters_join.txt"
+k8s_kubeadminit_outputfile: "k8s_kubeadminit_output.txt"
 k8s_join_worker_file: "k8s_workers_join.txt"
 
 # Local directory which will contain kubeconfig file to be used to connect to the cluster
@@ -65,8 +65,17 @@ k8s_helm_URL: "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm
 centos_selinux: "yes"
 
 # Define if selinux state must be "enforcing", "permissive" or "disabled" after cluster activation
-centos_selinux_state: "enforcing"
-#centos_selinux_state: "permissive"
+#centos_selinux_state: "enforcing"
+centos_selinux_state: "permissive"
+
+# Variable required to install crictl
+critools_version: "{{ global_k8s_minorversion }}"
+#centos_critools_pkgname: "cri-tools-{{critools_version}}"
+centos_critools_pkgname: "cri-tools"
+# Next line to define CRI-O system startup environment file
+centos_crio_envfile: "/etc/sysconfig/crio"
+# Next line to define CRI-O system startup file
+centos_crio_startupfile: "/usr/lib/systemd/system/crio.service" 
 
 # yum repository for Kubernetes
 centos_k8s_reponame1: "{{ global_k8s_reponame1 }}"

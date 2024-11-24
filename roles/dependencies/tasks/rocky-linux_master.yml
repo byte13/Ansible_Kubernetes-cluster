@@ -104,7 +104,6 @@
     - container-selinux
     - curl
     - git
-    #- helm
   when: inventory_hostname in groups['k8smasternodes']
 
 

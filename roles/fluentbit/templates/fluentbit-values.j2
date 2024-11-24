@@ -8,7 +8,7 @@ replicaCount: 1
 
 image:
   repository: cr.fluentbit.io/fluent/fluent-bit
-  # Overrides the image tag whose default is {{ .Chart.AppVersion }}
+  # Overrides the image tag whose default is {{ [dot]Chart.AppVersion }}
   # Set to "-" to not use the default value
   tag:
   digest:
@@ -169,7 +169,7 @@ prometheusRule:
 #     expr: rate(fluentbit_output_proc_bytes_total[5m]) == 0
 #     annotations:
 #       message: |
-#         Fluent Bit instance {{ $labels.instance }}'s output plugin {{ $labels.name }} has not processed any
+#         Fluent Bit instance {{ [dot]labels.instance }}'s output plugin {{ [dot]labels.name }} has not processed any
 #         bytes for at least 15 minutes.
 #       summary: No Output Bytes Processed
 #     for: 15m
@@ -313,7 +313,7 @@ env: []
 # https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function
 envWithTpl: []
 #  - name: FOO_2
-#    value: "{{ .Values.foo2 }}"
+#    value: "{{ [dot]Values.foo2 }}"
 #
 # foo2: bar2
 
@@ -331,7 +331,7 @@ extraContainers: []
 # String mode
 # extraContainers: |-
 #   - name: do-something
-#     image: bitnami/kubectl:{{ .Capabilities.KubeVersion.Major }}.{{ .Capabilities.KubeVersion.Minor }}
+#     image: bitnami/kubectl:{{ [dot]Capabilities.KubeVersion.Major }}[dot]{{ [dot]Capabilities.KubeVersion.Minor }}
 #     command: ['kubectl', 'version']
 
 flush: 1
@@ -369,13 +369,13 @@ config:
   service: |
     [SERVICE]
         Daemon Off
-        Flush {{ .Values.flush }}
-        Log_Level {{ .Values.logLevel }}
+        Flush {{ [dot]Values.flush }}
+        Log_Level {{ [dot]Values.logLevel }}
         Parsers_File /fluent-bit/etc/parsers.conf
         Parsers_File /fluent-bit/etc/conf/custom_parsers.conf
         HTTP_Server On
         HTTP_Listen 0.0.0.0
-        HTTP_Port {{ .Values.metricsPort }}
+        HTTP_Port {{ [dot]Values.metricsPort }}
         Health_Check On
 
   ## https://docs.fluentbit.io/manual/pipeline/inputs
@@ -409,14 +409,14 @@ config:
     [OUTPUT]
         Name opensearch
         Match kube.*
-        Host {{ global_opensearch-master_fqdn }}
+        Host {{ [dot]lobal_opensearchMaster_fqdn }}
         Logstash_Format On
         Retry_Limit False
 
     [OUTPUT]
         Name opensearch
         Match host.*
-        Host {{ global_opensearch-master_fqdn }}
+        Host {{ [dot]lobal_opensearchMaster_fqdn }}
         Logstash_Format On
         Logstash_Prefix node
         Retry_Limit False
@@ -497,7 +497,7 @@ initContainers: []
 # String mode
 # initContainers: |-
 #   - name: do-something
-#     image: bitnami/kubectl:{{ .Capabilities.KubeVersion.Major }}.{{ .Capabilities.KubeVersion.Minor }}
+#     image: bitnami/kubectl:{{ [dot]Capabilities.KubeVersion.Major }}[dot]{{ [dot]Capabilities.KubeVersion.Minor }}
 #     command: ['kubectl', 'version']
 
 logLevel: info
