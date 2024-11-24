@@ -51,7 +51,8 @@
 - name: "Disable memory swapping to disk in fstab since kubernetes cannot work with swap enabled"
   replace:
     path: /etc/fstab
-    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    #regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    regexp: '^(\/dev\/mapper\/rl-swap)'
     replace: '# \1'
   when: ansible_facts['os_family']|lower == 'redhat'
 
