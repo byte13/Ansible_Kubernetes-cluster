@@ -95,7 +95,7 @@
     state: stopped
   when: k8s_reset_cluster == "yes"
 
-- name: "Uninstall Kubernetes packages: {{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}, {{ centos_kubectl_pkgname }}"
+- name: "Uninstall Kubernetes packages: {{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}"
   dnf:
     name:
       - "{{ centos_kubeadm_pkgname }}"
@@ -108,36 +108,40 @@
     update_cache: yes
   when: k8s_reset_cluster == "yes"
 
-- name: Recursively remove /etc/kubernetes 
+- name: Recursively remove /etc/kubernetes and /var/lib/kubelet
   ansible.builtin.file:
-    path: /etc/kubernetes
+    path: "{{ item }}"
     state: absent
+  loop:
+    - /etc/kubernetes
+    - /var/lib/kubelet
   when: k8s_reset_cluster == "yes"
+
 
 # Note that Kubernetes repository has been added in dependencies role
 # crictl has been install by cri-o role
 # crictl is a CLI by Kubernetes to interact with installed CRI; it is required to deploy Kubernetes with kubeadm
-- name: "Install tools and Kubernetes packages: {{ centos_tc_pkgname }}, {{ centos_nettools_pkgname }}, {{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}, {{ centos_kubectl_pkgname }}"
+- name: "Install tools and Kubernetes packages: {{ centos_tc_pkgname }}, {{ centos_nettools_pkgname }}, {{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}"
   dnf:
     name:
       - "{{ centos_tc_pkgname }}"
       - "{{ centos_nettools_pkgname }}"
       - "{{ centos_kubeadm_pkgname }}-{{ k8s_version }}"
       - "{{ centos_kubelet_pkgname }}-{{ k8s_version }}"
-      - "{{ centos_kubectl_pkgname }}-{{ k8s_version }}"
+#      - "{{ centos_kubectl_pkgname }}-{{ k8s_version }}"
     state: present
     update_cache: yes
   notify:
-    - enable kubelet
+    - enable and start kubelet
 
 # Upload kubelet configuration file 
-- name: "Experimental - Upload kubelet configuration file"
-  template:
-    src:   cluster-kubelet-config.j2
-    dest:  "{{ k8s_cluster_kubelet_configfile }}"
-    owner: root
-    group: root
-    mode:  0640
+#- name: "Experimental - Upload kubelet configuration file"
+#  template:
+#    src:   cluster-kubelet-config.j2
+#    dest:  "{{ k8s_cluster_kubelet_configfile }}"
+#    owner: root
+#    group: root
+#    mode:  0640
 
 # Upload kubelet arguments configuration file 
 - name: "Upload kubelet arguments configuration file"

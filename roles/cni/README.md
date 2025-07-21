@@ -1,8 +1,8 @@
 # Container network interface
-This Ansible role installs Container Runtime Interfaces (CNI) in a Kubernetes cluster.   
+This Ansible role installs Container Network Interfaces (CNI) in a Kubernetes cluster.   
 
 ## Main steps to execute this Ansible playbook :
-1. Possibly adjust variables in roles/cni/var./main.yml (check comments in the file to understand effect of respective variables)
+1. Possibly adjust variables in roles/cni/vars/main.yml (check comments in the file to understand effect of respective variables)
    
 ## Directory structure :
 ```

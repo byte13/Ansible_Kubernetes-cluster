@@ -1,0 +1,139 @@
+---
+# tasks file for containerd on Rocky Linux, Redhat or CentOS
+#
+- name: Create system network configuration file {{ cri_net_configfile }}
+  file:
+    path: "{{ cri_net_configfile }}"
+    state: touch
+    mode: 0640
+
+- name: Set system network configuration
+  blockinfile:
+    path: "{{ cri_net_configfile }}"
+    block: |
+      net.ipv4.ip_forward = 1
+      net.bridge.bridge-nf-call-iptables = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+
+- name: Apply new settings
+  command: sysctl --system
+
+- name: Remove current libcontainer and CRI repositories 
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - "/etc/yum.repos.d/{{ centos_containerd_reponame }}.repo"
+
+#- name: Remove current libcontainer and CRI repositories 
+#  file:
+#    path: "{{ item }}"
+#    state: absent
+#  with_items:
+#  - "/etc/yum.repos.d/{{ centos_containerd_reponame1 }}.repo"
+#  - "/etc/yum.repos.d/{{ centos_containerd_reponame2 }}.repo"
+
+- name: Add containers libraries repository {{ centos_containerd_repobaseurl }} into /etc/yum.repos.d/{{ centos_containerd_reponame }}.repo
+  yum_repository:
+    name: "{{ centos_containerd_reponame }}"
+    state: present
+    description: "{{ centos_containerd_repodesc }}"
+    baseurl: "{{ centos_containerd_repobaseurl }}"
+    #gpgkey: "{{ centos_containerd_repogpgkey }}"
+    gpgcheck: yes
+
+# Installation of containerd 
+- name: "Install containerd {{ containerd_version }} packages: {{ centos_containerd_pkgname }}"
+  dnf:
+    name:
+      - "{{ centos_containerd_pkgname }}"
+    state: present
+    update_cache: yes
+  notify:
+    - enable containerd
+
+# Possibly remove proxy environment variables in /etc/sysconfig/containerd 
+- name: No proxy required - Remove proxy variable from {{ centos_containerd_envfile }} 
+  ansible.builtin.blockinfile:
+    path: "{{ centos_containerd_envfile }}"
+    create: true
+    marker_begin: "Next lines added by Ansible_Kubernetes-cluster playbook"
+    marker_end: "Previous lines added by Ansible_Kubernetes-cluster playbook"
+    block: "" 
+  when: global_proxy_required != "yes"
+
+# Configure containerd system startup environment file to add proxy variables
+# If required, set proxy environment variables in /etc/sysconfig/containerd 
+#- name: Set proxy in {{ centos_containerd_envfile }} 
+#  ansible.builtin.blockinfile:
+#    path: "{{ centos_containerd_envfile }}" 
+#    create: "true"
+#    marker_begin: "Next lines added by Ansible_Kubernetes-cluster playbook"
+#    marker_end: "Previous lines added by Ansible_Kubernetes-cluster playbook"
+#    block: |
+#      Environment="http_proxy={{ global_http_proxy }}"
+#      Environment="https_proxy={{ globl_https_proxy }}" 
+#      Environment="no_proxy={{ global_no_proxy }}"
+#      Environment="HTTP_PROXY={{ global_http_proxy }}"
+#      Environment="HTTPS_PROXY={{ global_https_proxy }}" 
+#      Environment="NO_PROXY={{ global_no_proxy }}"
+#  when: global_proxy_required == "yes"
+
+# Possibly remove proxy environment variables in /usr/lib/systemd/system/containerd.service 
+- name: No proxy required - Remove proxy variable from {{ centos_containerd_startupfile }} 
+  ansible.builtin.blockinfile:
+    path: "{{ centos_containerd_startupfile }}"
+    marker_begin: "Next lines added by Ansible_Kubernetes-cluster playbook"
+    marker_end: "Previous lines added by Ansible_Kubernetes-cluster playbook"
+    block: "" 
+  #when: global_proxy_required != "yes"
+
+# Configure containerd system startup file to add proxy variables
+# If required, set proxy environment variables in /usr/lib/systemd/system/containerd.service 
+- name: Set proxy in {{ centos_containerd_startupfile }} 
+  ansible.builtin.blockinfile:
+    path: "{{ centos_containerd_startupfile }}" 
+    marker_begin: "Next lines added by Ansible_Kubernetes-cluster playbook"
+    marker_end: "Previous lines added by Ansible_Kubernetes-cluster playbook"
+    insertafter: "^EnvironmentFile="
+    block: |
+      Environment=http_proxy={{ global_http_proxy }}
+      Environment=https_proxy={{ global_https_proxy }}
+      Environment=no_proxy={{ global_no_proxy }}
+      Environment=HTTP_PROXY={{ global_http_proxy }}
+      Environment=HTTPS_PROXY={{ global_https_proxy }}
+      Environment=NO_PROXY={{ global_no_proxy }}
+  when: global_proxy_required == "yes"
+
+# Upload registries configuration file
+- name: "Upload registries configuration file to {{ cri_registries_configfile }}"  
+  template:
+    src:   registries.conf.j2
+    dest:   "{{ cri_registries_configfile }}"
+    owner: root
+    group: root
+    mode:  0640
+    backup: yes
+
+# Upload containerd configuration file
+- name: "Upload containerd configuration file {{ cri_containerd_configfile }}"  
+  template:
+    src:   cri.conf.j2
+    dest:   "{{ cri_crio_configfile }}"
+    owner: root
+    group: root
+    mode:  0640
+    backup: yes
+
+# Remove possible containerd bridge configuration file
+- name: Remove possible containerd bridge configuration file {{ cri_bridge_configfile }}
+  file:
+    path: "{{ cri_bridge_configfile }}"
+    state: absent
+
+- name: "Restart containerd" 
+  systemd:
+    name: containerd
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

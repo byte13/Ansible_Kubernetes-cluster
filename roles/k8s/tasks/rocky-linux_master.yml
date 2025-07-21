@@ -34,6 +34,9 @@
     - 10251/tcp
     - 10252/tcp
     - 10255/tcp
+    - 10257/tcp
+    - 10259/tcp
+
   when: (inventory_hostname in groups['k8smasternodes']) and (global_cni != 'calico')
   notify:
     - restart firewalld
@@ -110,10 +113,13 @@
     update_cache: yes
   when: k8s_reset_cluster == "yes"
 
-- name: "Recursively remove /etc/kubernetes"
+- name: Recursively remove /etc/kubernetes and /var/lib/kubelet
   ansible.builtin.file:
-    path: /etc/kubernetes
+    path: "{{ item }}"
     state: absent
+  loop:
+    - /etc/kubernetes
+    - /var/lib/kubelet
   when: k8s_reset_cluster == "yes"
 
 # Note that Kubernetes dnf/yum repository has been added by dependencies role
@@ -229,15 +235,15 @@
     state: restarted
     enabled: yes
 
-- name: "Wait for k8s master node(s) to be ready..."
-  become: no
-  shell: kubectl wait --for=condition=Ready nodes --selector node-role.kubernetes.io/control-plane="" --timeout=180s
-  register: masternodes_ready
+#- name: "Wait for k8s master node(s) to be ready..."
+#  become: no
+#  shell: kubectl wait --for=condition=Ready nodes --selector node-role.kubernetes.io/control-plane="" --timeout=180s
+#  register: masternodes_ready
 
-- name: "Wait for all pods on k8s master node(s) to be ready..."
-  become: no
-  shell: kubectl wait pods --all -n kube-system --for condition=Ready --timeout=600s 
-  register: masternodes_pods_ready
+#- name: "Wait for all pods on k8s master node(s) to be ready..."
+#  become: no
+#  shell: kubectl wait pods --all -n kube-system --for condition=Ready --timeout=600s 
+#  register: masternodes_pods_ready
 
 - name: "Set selinux back to mode defined in centos_selinux_state variable in role/k8s/vars/main.yml (current value : {{ centos_selinux_state }})"
   ansible.posix.selinux:

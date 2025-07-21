@@ -1,0 +1,18 @@
+---
+# tasks file for CRI 
+# Import Linux distribution specific playbooks
+- name: Install CRI-O on master Redhat
+  import_tasks: rocky-linux_cri-o.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (global_cri == "cri-o")
+
+- name: Install CRI-O on master on Rocky-Linux 
+  import_tasks: rocky-linux_cri-o.yml
+  when: (ansible_facts['os_family']|lower == 'rocky') and (global_cri == "cri-o")
+
+- name: Install containerd on Redhat
+  import_tasks: rocky-linux_containerd.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (global_cri == "containerd")
+
+- name: Install containerd on Rocky-Linux 
+  import_tasks: rocky-linux_containerd.yml
+  when: (ansible_facts['os_family']|lower == 'rocky') and (global_cri == "conainerd")

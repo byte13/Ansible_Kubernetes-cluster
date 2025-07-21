@@ -1,18 +1,19 @@
 ---
-# tasks file for k8s 
+# tasks file for CNI 
 # Import Linux distribution specific playbooks
-- name: Install CNI on on master RedHat 
-  import_tasks: rocky-linux_master.yml
-  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes'])
+- name: Install calico CNI on master nodes RedHat 
+  import_tasks: rocky-linux_masters_calico.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes']) and (global_cni == "calico")
 
-- name: Install CNI on Rocky on master Linux 
-  import_tasks: rocky-linux_master.yml
-  when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8smasternodes'])
+- name: Install cilium CNI on master nodes RedHat 
+  import_tasks: rocky-linux_masters_cilium.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
-- name: Install CNI on worker RedHat 
-  import_tasks: rocky-linux_workers.yml
-  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8sworkernodes'])
+- name: Install calico CNI on worker nodes RedHat 
+  import_tasks: rocky-linux_workers_calico.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8sworkernodes']) and (global_cni == "calico")
 
-- name: Install CNI on worker Rocky Linux 
-  import_tasks: rocky-linux_workers.yml
-  when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8sworkernodes'])
+- name: Install cilium CNI on worker nodes RedHat 
+  import_tasks: rocky-linux_workers_cilium.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8sworkernodes']) and (global_cni == "cilium")
+

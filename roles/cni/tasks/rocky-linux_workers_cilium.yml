@@ -1,0 +1,26 @@
+---
+# tasks file for k8s CNI
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: cni_display_facts == "yes"
+
+#################
+# Cilium specific
+#################
+- name: Set firewall rules for Cilium CNI to allow health checks and VXLAN on CentOS/Redhat/Rock-Linux
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop: 
+    # For Cilium CNI
+    - 8472/udp
+    - 4240/tcp
+  notify:
+    - reload firewalld
+  when: (inventory_hostname in groups['k8sworkernodes']) and (global_cni == "cilium")
+

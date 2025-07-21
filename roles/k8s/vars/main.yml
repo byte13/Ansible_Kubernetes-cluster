@@ -26,18 +26,19 @@ k8s_apiserver_advip: "10.13.4.10"
 
 # Kubernetes pods subnet
 #     Ensure that the specified range doesn't overlap with other enterprise subnets so that no routing ambiguity exists in the pods.
-k8s_pods_subnet: "10.100.0.0/16"
+k8s_pods_subnet: "{{ global_pods_cidr }}"
 
 # Kubernetes services subnet
 #     Ensure that the specified range doesn't overlap with other enterprise subnets so that no routing ambiguity exists in the pods.
-k8s_services_subnet: "10.150.0.0/16"
+k8s_services_subnet: "{{ global_services_cidr }}"
 
 # Parameters to set in Kubelet config file instead of passing them as deprecated command line arguments
 k8s_cluster_kubelet_configfile: "/etc/kubernetes/cluster-kubelet-config.yaml"
 k8s_cgroup_driver: "systemd"
 
 # Arguments to pass to kubelet process
-k8s_kubelet_extraargs: "--cgroup-driver=systemd --container-runtime-endpoint='unix:///var/run/crio/crio.sock"
+k8s_kubelet_extraargs_crio: "--cgroup-driver=systemd --container-runtime-endpoint='unix:///run/crio/crio.sock"
+k8s_kubelet_extraargs_containerd: "--cgroup-driver=systemd --container-runtime-endpoint='unix:///run/containerd/containerd.sock"
 
 # Destination file to contain aforementioned arguments
 k8s_kubelet_extraargs_destfile: "/etc/default/kubelet"
@@ -72,10 +73,6 @@ centos_selinux_state: "permissive"
 critools_version: "{{ global_k8s_minorversion }}"
 #centos_critools_pkgname: "cri-tools-{{critools_version}}"
 centos_critools_pkgname: "cri-tools"
-# Next line to define CRI-O system startup environment file
-centos_crio_envfile: "/etc/sysconfig/crio"
-# Next line to define CRI-O system startup file
-centos_crio_startupfile: "/usr/lib/systemd/system/crio.service" 
 
 # yum repository for Kubernetes
 centos_k8s_reponame1: "{{ global_k8s_reponame1 }}"

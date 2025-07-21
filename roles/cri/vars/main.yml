@@ -1,0 +1,73 @@
+---
+# vars file for cri-o and containerd Rocky-Linux/Centos/Redhat 
+#
+######################################################
+# Common variables
+#
+#
+# Easier procedure available on : https://github.com/cri-o/packaging/blob/main/README.md
+crio_version: "{{ global_k8s_version }}"
+crio_minorversion: "{{ global_k8s_minorversion }}"
+crio_projectpath: "stable:/{{ crio_version }}"
+#critools_version: "{{ global_k8s_minorversion }}"
+
+# CRI pods subnet
+#     Ensure chosen subnet doesn't conflict with enterprise subnet that pods should connect to.
+cri_pods_subnet: "10.100.0.0/16"
+
+# Allowed OCI images registries
+#     Add or remove required registries
+cri_allowed_registries: "'docker.io', 'quay.io'"
+
+# System network configuration file
+cri_net_configfile: "/etc/sysctl.d/99-kubernetes-cri.conf"
+
+# Registries configuration file
+cri_registries_configfile: "/etc/containers/registries.conf"
+
+# CRI-O configuration file
+cri_crio_configfile: "/etc/crio/crio.conf"
+
+# CRI bridge configuration file
+cri_bridge_configfile: "/etc/cni/net.d/100-crio-bridge.conf"
+
+# Containerd configuration file
+cri_containerd_configfile: "/etc/containerd/config.toml"
+
+#
+# End of common varibles
+######################################################
+######################################################
+# Rocky Linux (CentOS) specific
+#
+
+# Next line to define CRI-O system startup environment file
+centos_crio_envfile: "/etc/sysconfig/crio"
+# Next line to define CRI-O system startup file
+centos_crio_startupfile: "/usr/lib/systemd/system/crio.service"
+
+# According to https://github.com/cri-o/packaging/blob/main/README.md
+centos_crio_reponame: "cri-o"
+centos_crio_repodesc: "Stable release of {{crio_version}}"
+centos_crio_repobaseurl: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/"
+centos_crio_repogpgkey: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/repodata/repomd.xml.key"
+centos_crio_pkgname: "cri-o"
+
+
+# Next line to define containerd system startup environment file
+centos_containerd_envfile: "/etc/sysconfig/"
+# Next line to define containerd system startup file
+centos_containerd_startupfile: "/usr/lib/systemd/system/containerd.service"
+
+# Next repo required to install containerd CRI
+centos_docker_reponame: "docker-ce-stable"
+centos_docker_repodesc: "Stable release of docker-ce"
+centos_docker_repo: "https://download.docker.com/linux/centos/docker-ce.repo"
+centos_contained_pkgname: "containerd.io"
+#centos_runc_pkgname: "runc"
+
+#
+# End of CentOS specific
+######################################################
+
+

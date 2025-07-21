@@ -1,0 +1,92 @@
+---
+# tasks file for k8s CNI
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: cni_display_facts == "yes"
+
+#################
+# Calico specific
+#################
+#- name: Set firewalld trusted zone as the default zone 
+#  become: yes
+#  shell: |
+#    firewall-cmd --set-default-zone trusted 
+#  notify:
+#    - reload firewalld
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "calico")
+
+#- name: Set interface "{{ centos_host_interface }}" in public firewall zone on CentOS/Redhat/Rock-Linux
+#  firewalld:
+#    zone: public
+#    interface: "{{ centos_host_interface }}"
+#    permanent: yes
+#    immediate: yes
+#    state: enabled
+#  notify:
+#    - reload firewalld
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
+
+#- name: Set interface {{ centos_host_interface }} in public firewall zone on CentOS/Redhat/Rock-Linux
+#  become: yes
+#  shell: |
+#    firewall-cmd --zone=public --add-interface={{ centos_host_interface }} --permanent
+#  notify:
+#    - reload firewalld
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
+
+#- name: Set firewall masquerade Calico CNI on CentOS/Redhat/Rock-Linux
+#  firewalld:
+#    zone: public
+#    masquerade: yes
+#    state: enabled
+#    permanent: yes
+#    immediate: yes
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
+
+#- name: Set firewall rules for Calico CNI to allow BGP on CentOS/Redhat/Rock-Linux
+#  firewalld:
+#    zone: public
+#    port: "{{ item }}"
+#    permanent: yes
+#    immediate: yes
+#    state: enabled
+#  loop:
+#    # For Calico CNI
+#    - 179/tcp
+#  notify:
+#    - reload firewalld
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
+
+# Next rule required if Calico ipipMode is set to "Always".
+# Not required if ipipMode is set to "CrossSubnet" and all nodes are in same subnet
+#- name: Set firewall rules for Calico CNI to allow protocol 4 (IPinIP tunnel) on CentOS/Redhat/Rock-Linux
+#  shell: /bin/firewall-cmd --permanent --add-protocol=4  --zone public
+#  notify:
+#    - reload firewalld
+#  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "calico")
+
+# Ensure NetworkManager doesn't manage Calico interfaces
+# Reference : https://docs.tigera.io/calico/latest/operations/troubleshoot/troubleshooting#configure-networkmanager
+- name: Ensure NetworkManager doesn't interfere with Calico interfaces - Upload {{ centos_calico_netmgr_configfile }}
+  template:
+    src:   calico.conf.j2
+    dest:  "{{ centos_calico_netmgr_configfile }}"
+    owner: root
+    group: root
+    mode:  0640
+  notify:
+    - restart NetworkManager
+  when: (inventory_hostname in groups['k8sworkernodes']) and (global_cni == "calico")
+
+# Stop and disable firewalld; use Calico to manage IP filtering on Kubernetes nodes interfaces
+# References: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements
+#             https://docs.tigera.io/calico/latest/network-policy/hosts
+- name: Stop and disable firewalld; use Calico to manage IP filtering on Kubernetes nodes interfaces
+  ansible.builtin.service:
+    name: firewalld
+    state: stopped
+    enabled: no
+  when: (inventory_hostname in groups['k8sworkernodes']) and (global_cni == "calico")
+

@@ -6,7 +6,7 @@
 
   roles: 
   - dependencies
-  - cri-o
+  - cri
   - k8s
   - cni
   - auditing
@@ -26,7 +26,7 @@
 
   roles: 
   - dependencies
-  - cri-o
+  - cri
   - k8s
   - cni
 #  - cisbenchmark
