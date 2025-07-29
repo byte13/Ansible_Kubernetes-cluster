@@ -56,8 +56,8 @@ global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.lo
 
 # Choose CNI type. Could be : calico, cilium.
 # Calico, only, is fully tested, yet
-#global_cni:            "calico"
-global_cni:            "cilium"
+global_cni:            "calico"
+#global_cni:            "cilium"
 
 # Define if Gateway API CRD's and experimental CRD's must be installed
 global_install_gwapicrds:    "yes"
