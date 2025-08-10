@@ -10,9 +10,10 @@
 #  - k8s
 #  - cni
 #  - auditing
-  - gatewayapi-crds
-  - ingress-haproxy
-#  - ingress-kong
+#  - gatewayapi-crds
+#  - ingress-haproxy
+#  - ingress-nginx-fabric
+  - ingress-kong
 #  - admission
 #  - gitops
 #  - fluentbit
@@ -25,8 +26,8 @@
   become_user: root
 
   roles: 
-  - dependencies
-  - cri
-  - k8s
-  - cni
+#  - dependencies
+#  - cri
+#  - k8s
+#  - cni
 #  - cisbenchmark

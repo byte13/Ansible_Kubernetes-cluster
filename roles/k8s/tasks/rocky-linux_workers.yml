@@ -93,6 +93,7 @@
   systemd:
     name: kubelet
     state: stopped
+  ignore_errors: true
   when: k8s_reset_cluster == "yes"
 
 - name: "Uninstall Kubernetes packages: {{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}"

@@ -13,7 +13,11 @@ crio_projectpath: "stable:/{{ crio_version }}"
 
 # CRI pods subnet
 #     Ensure chosen subnet doesn't conflict with enterprise subnet that pods should connect to.
-cri_pods_subnet: "10.100.0.0/16"
+cri_pods_subnet: "{{ global_pods_cidr }}"
+
+  # CRI services subnet
+#     Ensure chosen subnet doesn't conflict with enterprise subnet that pods should connect to.
+cri_services_subnet: "{{ global_services_cidr }}"
 
 # Allowed OCI images registries
 #     Add or remove required registries
@@ -64,10 +68,7 @@ centos_docker_reponame: "docker-ce-stable"
 centos_docker_repodesc: "Stable release of docker-ce"
 centos_docker_repo: "https://download.docker.com/linux/centos/docker-ce.repo"
 centos_contained_pkgname: "containerd.io"
-#centos_runc_pkgname: "runc"
 
 #
 # End of CentOS specific
 ######################################################
-
-

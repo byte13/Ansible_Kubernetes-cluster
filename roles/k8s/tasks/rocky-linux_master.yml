@@ -13,13 +13,6 @@
     state: permissive
   when: centos_selinux == "yes"
 
-#- name: "Ensure selinux remains permissive accross reboots during initialization of Kubernetes"
-#  replace:
-#    path: /etc/sysconfig/selinux 
-#    regexp: '^([^#].*?\sSELINUX=enforcing\s+sw\s+.*)$'
-#    replace: 'SELINUX=permissive'
-#  when: centos_selinux == "yes"
-
 - name: "Set firewall rules on k8s master nodes on CentOS/RedHat/Rocky-Linux"
   firewalld:
     zone: public
@@ -97,6 +90,7 @@
   systemd:
     name: kubelet
     state: stopped
+  ignore_errors: true
   when: k8s_reset_cluster == "yes"
 
 - name: "Uninstall Kubernetes packages: {{ centos_kubeadm_pkgname }}, {{ centos_kubelet_pkgname }}, {{ centos_kubectl_pkgname }}"
@@ -143,15 +137,6 @@
   command: kubeadm reset -f
   when: k8s_reset_cluster == "yes"
 
-# Upload kubelet configuration file  in dependencies role
-#- name: "Experimental - Upload kubelet configuration file"
-#  template:
-#    src:   cluster-kubelet-config.j2
-#    dest:  "{{ k8s_cluster_kubelet_configfile }}"
-#    owner: root
-#    group: root
-#    mode:  0640
-
 # Upload kubelet arguments configuration file 
 - name: "Upload kubelet arguments configuration file"
   template:
@@ -168,8 +153,6 @@
                         --service-cidr={{ k8s_services_subnet }} \
                         --pod-network-cidr={{ k8s_pods_subnet }} \
                         --upload-certs
-                        #--cri-socket=/var/run/crio/crio.sock
-  #command: kubeadm init --config={{ k8s_cluster_kubelet_configfile }}
   register: kubernetes_kubeadminit_output
   when: inventory_hostname in groups['k8smasternodes']
 

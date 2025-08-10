@@ -40,14 +40,18 @@
     mode:  0640
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
-- name: Install Kong controller using Helm chart 
+- name: Install Kong ingress controller using Helm chart 
   become: no
   shell: |
-    helm install {{ centos_kong_helm_chart }} -f {{ ingress_kong_helmvaluesfile }} --create-namespace --namespace {{ centos_kong_namespace }} 
+    helm install {{ centos_kong_helm_chart }} -f {{ ingress_kong_helmvaluesfile }} --create-namespace --namespace {{ centos_kong_namespace }}
+    # Next line required because respective parameter in {{ ingress_kong_helmvaluesfile }} fails
+    # To determine how ip-restriction plugin behaves.
+    # externalTrafficPolicy: Local means : filter on external IPs instead of Cluster ones
+    kubectl --namespace {{ centos_kong_namespace }} patch service kong-gateway-proxy -p '{"spec":{"externalTrafficPolicy":"Local"}}'
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
-- name: "Remove {{ ingress_kong_helmvaluesfile }} from remote host"
-  become: no
-  file:
-    path: "{{ ingress_kong_helmvaluesfile }}"
-    state: absent
+#- name: "Remove {{ ingress_kong_helmvaluesfile }} from remote host"
+#  become: no
+#  file:
+#    path: "{{ ingress_kong_helmvaluesfile }}"
+#    state: absent

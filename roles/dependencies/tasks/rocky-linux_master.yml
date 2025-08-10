@@ -14,7 +14,8 @@
     marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: "" 
-  #when: global_proxy_required != "yes" 
+    mode: '0644'
+  when: global_proxy_required != "yes" 
 
 # If required, set proxy global environment variables in /etc/environment 
 # To check what programs leverage /etc/environment, run grep -l pam_env /etc/pam.d/* on target host
@@ -30,6 +31,7 @@
       HTTP_PROXY="{{ global_http_proxy }}"
       HTTPS_PROXY="{{ global_https_proxy }}" 
       NO_PROXY="{{ global_no_proxy }}"
+    mode: '0644'
   when: global_proxy_required == "yes" 
 
 # Possibly delete /etc/profile.d/http_proxy.sh
@@ -38,7 +40,7 @@
   ansible.builtin.file:
     path: "{{ global_proxy_profile }}" 
     state: absent
-  #when: global_proxy_required != "yes" 
+  when: global_proxy_required != "yes" 
 
 # If required, set proxy global environment variables in /etc/profile.d/http_proxy.sh
 # For programs started in a shell interpreter (typically bash, sh) 
@@ -55,6 +57,7 @@
       export HTTP_PROXY="{{ global_http_proxy }}"
       export HTTPS_PROXY="{{ global_https_proxy }}"
       export NO_PROXY="{{ global_no_proxy }}"
+    mode: '0644'
   when: global_proxy_required == "yes" 
 
 # Remove possible proxy definitions from /etc/dnf/dnf.conf
@@ -65,7 +68,8 @@
     marker_begin: "# Next lines added by Ansible_Kubernetes-cluster playbook"
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: "" 
-  #when: global_proxy_required != "yes" 
+    mode: '0644'
+  when: global_proxy_required != "yes" 
 
 # If required, set proxy in /etc/dnf/dnf.conf
 - name: Proxy required - Set proxy in /etc/dnf/dnf.conf 
@@ -76,6 +80,7 @@
     marker_end: "# Previous lines added by Ansible_Kubernetes-cluster playbook"
     block: |
       proxy="{{ global_http_proxy }}"
+    mode: '0644'
   when: global_proxy_required == "yes" 
 
 # The following repository is required to install Kubernetes using kubeadm

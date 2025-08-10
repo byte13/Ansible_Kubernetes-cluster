@@ -24,15 +24,14 @@ gateway:
     tls:
       enabled: true
       nodePort: 32443
-
-    service:
+  service:
     # To determine how ip-restriction plugin behaves.
     # Local means : filter on external IP's instead of Cluster ones
     spec:
       externalTrafficPolicy: Local
 
 # Use a DaemonSet controller instead of a Deployment controller
-  deployment:
-    kong:
-      enabled: true
-    daemonset: true
+deployment:
+  kong:
+    enabled: true
+  daemonset: true

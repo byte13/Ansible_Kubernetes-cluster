@@ -5,3 +5,9 @@ controller:
   kind: DaemonSet
   daemonset:
     useHostPort: true 
+
+# Possibly not required with latest versions of HAProxy
+# If required, see :  https://www.haproxy.com/documentation/kubernetes-ingress/gateway-api/enable-gateway-api/
+#  kubernetesGateway:
+#    enabled: true
+#    gatewayControllerName: haproxy.org/gateway-controller

@@ -1,0 +1,31 @@
+---
+# tasks file for ingress-nginx
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: ingress_display_facts == "yes"
+
+##################
+# NGinx specific
+##################
+- name: Set firewall rules for NGinx trafics on CentOS/Redhat/Rock-Linux
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - 80/tcp
+    - 443/tcp
+  notify:
+    - reload firewalld
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_ingress == "haproxy") and (global_cni != "calico")
+
+- name: Install NGinx Gateway Fabric controller using Helm chart 
+  become: no
+  shell: |
+    helm install ngf {{ centos_nginx_helm_repository }} --create-namespace -n {{ centos_nginx_namespace }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "nginx")
+
