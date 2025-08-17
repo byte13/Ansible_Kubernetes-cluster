@@ -1,0 +1,24 @@
+---
+# vars file for Rancher 
+#
+######################################################
+# Common variables
+#
+# If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
+certmanager_version: "v1.18.2"
+certmanager_display_facts: "{{ global_display_facts }}"
+certmanager_helmvaluesfile: "/tmp/certmanager-values.yaml"
+#
+# End of common varibles
+######################################################
+######################################################
+# CentOS specific
+#
+centos_certmanager_helm_reponame: "jetstack"
+centos_certmanager_helm_repository: "https://charts.jetstack.io"
+centos_certmanager_helm_chart: "{{centos_certmanager_helm_reponame}} {{centos_certmanager_helm_reponame}}/cert-manager"
+centos_certmanager_manifesturl: "https://github.com/cert-manager/cert-manager/releases/download/{{ certmanager_version }}/cert-manager.yaml"
+centos_certmanager_namespace: "{{centos_certmanager_helm_reponame}}"
+# End of CentOS specific
+######################################################
+

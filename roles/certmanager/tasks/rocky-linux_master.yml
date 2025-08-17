@@ -1,0 +1,54 @@
+---
+# tasks file for cert-manager
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: certmanager_display_facts == "yes"
+
+##################
+# cert-manager specific
+##################
+
+- name: Set firewall rules for certmanager trafics on CentOS/Redhat/Rock-Linux
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - 8080/tcp
+    - 8443/tcp
+  notify:
+    - reload firewalld
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni != "calico")
+
+- name: Add certmanager controller Helm repository
+  become: no
+  shell: |
+    helm repo add {{ centos_certmanager_helm_reponame }} {{ centos_certmanager_helm_repository }}
+    helm repo update
+  when: (inventory_hostname in groups['k8smasternodes']) 
+
+- name: Upload certmanager helm chart value file to {{ certmanager_helmvaluesfile }} 
+  become: no
+  template:
+    src:   certmanager-values.j2 
+    dest:  "{{ certmanager_helmvaluesfile }}"
+    mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes'])
+
+- name: Install certmanager using Helm chart 
+  become: no
+  shell: |
+    #helm install {{ centos_certmanager_helm_chart }} -f {{ certmanager_helmvaluesfile }} --create-namespace --namespace {{ centos_certmanager_namespace }} --version {{ certmanager_version }} --set crds.enabled=truer_namespace }}
+    #helm install {{ centos_certmanager_helm_chart }} --create-namespace --namespace {{ centos_certmanager_namespace }} --version {{ certmanager_version }} --set crds.enabled=true
+    kubectl apply -f {{ centos_certmanager_manifesturl }}
+  when: (inventory_hostname in groups['k8smasternodes']) 
+
+- name: "Remove {{ certmanager_helmvaluesfile }} from remote host"
+  become: no
+  file:
+    path: "{{ certmanager_helmvaluesfile }}"
+    state: absent

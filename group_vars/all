@@ -54,6 +54,10 @@ global_http_proxy:     "http://{{global_proxy_ip}}:{{global_proxy_port}}"
 global_https_proxy:    "http://{{global_proxy_ip}}:{{global_proxy_port}}"
 global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
+# Set next variable to "yes" if one must wait for the master node(s) to be ready before proceeding
+global_wait_masters:   "yes"
+global_wait_seconds:   120 
+
 # Choose CNI type. Could be : calico, cilium.
 # Calico, only, is fully tested, yet
 global_cni:            "calico"

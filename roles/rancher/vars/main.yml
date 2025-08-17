@@ -1,0 +1,23 @@
+---
+# vars file for Rancher 
+#
+######################################################
+# Common variables
+#
+# If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
+rancher_version: "stable"
+rancher_display_facts: "{{ global_display_facts }}"
+rancher_helmvaluesfile: "/tmp/rancher-values.yaml"
+#
+# End of common varibles
+######################################################
+######################################################
+# CentOS specific
+#
+centos_rancher_helm_reponame: "rancher-{{rancher_version}}"
+centos_rancher_helm_repository: "https://releases.rancher.com/server-charts/{{rancher_version}}"
+centos_rancher_helm_chart: "{{centos_rancher_helm_reponame}} {{centos_rancher_helm_reponame}}/rancher"
+centos_rancher_namespace: "{{centos_rancher_helm_reponame}}"
+# End of CentOS specific
+######################################################
+

@@ -92,3 +92,21 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+
+#- name: "Wait for k8s master node(s) to be ready..."
+#  become: no
+#  shell: |
+#    # Keep the s at the end
+#    kubectl wait --for=condition=Ready nodes --selector node-role.kubernetes.io/control-plane="" --timeout={{ global_wait_seconds }}s
+#  register: masternodes_ready
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_wait_masters == "yes")
+
+- name: "Wait for api-server and all pods on k8s master node(s) to be ready..."
+  become: no
+  shell: |
+    sleep {{ global_wait_seconds }}
+    # Keep the s at the end
+    kubectl wait pod --all -n kube-system --for condition=ContainersReady --timeout={{ global_wait_seconds }}s
+  register: masternodes_containers_ready
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_wait_masters == "yes")
+

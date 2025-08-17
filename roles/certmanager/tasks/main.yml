@@ -1,0 +1,18 @@
+---
+# tasks file for ingress-kong 
+# Import Linux distribution specific playbooks
+- name: Install ingress controller on RedHat 
+  import_tasks: rocky-linux_master.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes'])
+
+- name: Install ingress controller on Rocky Linux 
+  import_tasks: rocky-linux_master.yml
+  when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8smasternodes'])
+
+- name: Set ingress for ingress controller on worker on RedHat 
+  import_tasks: rocky-linux_workers.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8sworkernodes'])
+
+- name: Set ingress for ingress controller on worker on Rocky Linux 
+  import_tasks: rocky-linux_workers.yml
+  when: (ansible_facts['os_family']|lower == 'rocky') and (inventory_hostname in groups['k8sworkernodes'])

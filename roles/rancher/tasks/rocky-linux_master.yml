@@ -1,0 +1,53 @@
+---
+# tasks file for Rancher
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: rancher_display_facts == "yes"
+
+##################
+# Rancher specific
+##################
+
+- name: Set firewall rules for Rancher trafics on CentOS/Redhat/Rock-Linux
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - 8080/tcp
+    - 8443/tcp
+  notify:
+    - reload firewalld
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni != "calico")
+
+- name: Add Rancher controller Helm repository
+  become: no
+  shell: |
+    helm repo add {{ centos_rancher_helm_reponame }} {{ centos_rancher_helm_repository }}
+    helm repo update
+  when: (inventory_hostname in groups['k8smasternodes']) 
+
+- name: Upload Rancher helm chart value file to {{ rancher_helmvaluesfile }} 
+  become: no
+  template:
+    src:   rancher-values.j2 
+    dest:  "{{ rancher_helmvaluesfile }}"
+    mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes'])
+
+- name: Install Rancher using Helm chart 
+  become: no
+  shell: |
+    #helm install {{ centos_rancher_helm_chart }} -f {{ rancher_helmvaluesfile }} --create-namespace --namespace {{ centos_rancher_namespace }}
+    helm install {{ centos_rancher_helm_chart }} --create-namespace --namespace {{ centos_rancher_namespace }} --set tls=external
+  when: (inventory_hostname in groups['k8smasternodes']) 
+
+- name: "Remove {{ rancher_helmvaluesfile }} from remote host"
+  become: no
+  file:
+    path: "{{ rancher_helmvaluesfile }}"
+    state: absent

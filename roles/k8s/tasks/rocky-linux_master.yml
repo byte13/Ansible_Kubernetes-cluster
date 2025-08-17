@@ -220,13 +220,17 @@
 
 #- name: "Wait for k8s master node(s) to be ready..."
 #  become: no
-#  shell: kubectl wait --for=condition=Ready nodes --selector node-role.kubernetes.io/control-plane="" --timeout=180s
+#  shell: |
+#    kubectl wait --for=condition=Ready nodes --selector node-role.kubernetes.io/control-plane="" --timeout=180s
 #  register: masternodes_ready
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_wait_masters == "yes")
 
 #- name: "Wait for all pods on k8s master node(s) to be ready..."
 #  become: no
-#  shell: kubectl wait pods --all -n kube-system --for condition=Ready --timeout=600s 
-#  register: masternodes_pods_ready
+#  shell: |
+#    kubectl wait pod --all -n kube-system --for condition=Ready --timeout=600s 
+#  register: masternodes_containers_ready
+#  when: (inventory_hostname in groups['k8smasternodes']) and (global_wait_masters == "yes")
 
 - name: "Set selinux back to mode defined in centos_selinux_state variable in role/k8s/vars/main.yml (current value : {{ centos_selinux_state }})"
   ansible.posix.selinux:

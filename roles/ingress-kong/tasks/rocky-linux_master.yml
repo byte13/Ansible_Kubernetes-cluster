@@ -25,33 +25,42 @@
     - reload firewalld
   when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_ingress == "kong") and (global_cni != "calico")
 
+# Installation according to https://charts.konghq.com/
+- name: Install Gateway API CRDs using Helm chart
+  become: no
+  shell: |
+    kubectl delete -f {{ centos_kong_gwapi_crdsurl }}
+    kubectl apply -f {{ centos_kong_gwapi_crdsurl }}
+    # Next line to install experimental CRDs, typically for TCProutes or UDProutes
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
+
 - name: Add Kong controller Helm repository
   become: no
   shell: |
-    helm repo add {{ centos_kong_reponame }} {{ centos_kong_helm_repository }}
+    helm repo add {{ centos_kong_helm_reponame }} {{ centos_kong_helm_repository }}
     helm repo update
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
-- name: Upload Ingress controller helm chart value file to {{ ingress_kong_helmvaluesfile }} 
+- name: Upload Kong controller helm chart value file to {{ ingress_kong_helm_valuesfile }} 
   become: no
   template:
     src:   kong-ingress-values.j2 
-    dest:  "{{ ingress_kong_helmvaluesfile }}"
+    dest:  "{{ ingress_kong_helm_valuesfile }}"
     mode:  0640
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
 - name: Install Kong ingress controller using Helm chart 
   become: no
   shell: |
-    helm install {{ centos_kong_helm_chart }} -f {{ ingress_kong_helmvaluesfile }} --create-namespace --namespace {{ centos_kong_namespace }}
-    # Next line required because respective parameter in {{ ingress_kong_helmvaluesfile }} fails
+    helm install {{ centos_kong_helm_chart }} -f {{ ingress_kong_helm_valuesfile }} --create-namespace --namespace {{ centos_kong_namespace }}
+    # Next line required because respective parameter in {{ ingress_kong_helm_valuesfile }} fails
     # To determine how ip-restriction plugin behaves.
     # externalTrafficPolicy: Local means : filter on external IPs instead of Cluster ones
     kubectl --namespace {{ centos_kong_namespace }} patch service kong-gateway-proxy -p '{"spec":{"externalTrafficPolicy":"Local"}}'
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "kong")
 
-#- name: "Remove {{ ingress_kong_helmvaluesfile }} from remote host"
+#- name: "Remove {{ ingress_kong_helm_valuesfile }} from remote host"
 #  become: no
 #  file:
-#    path: "{{ ingress_kong_helmvaluesfile }}"
+#    path: "{{ ingress_kong_helm_valuesfile }}"
 #    state: absent

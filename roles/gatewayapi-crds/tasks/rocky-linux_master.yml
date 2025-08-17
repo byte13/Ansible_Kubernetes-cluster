@@ -9,7 +9,7 @@
 - name: Deploy Kubernetes Gateway API Custom Resources Definitions (CRD)
   become: no
   shell: |
-    kubectl apply -f {{ centos_gwapi_crdurl }}
+    kubectl create -f {{ centos_gwapi_crdurl }}
   when: (inventory_hostname in groups['k8smasternodes']) and (global_install_gwapicrds == "yes")
 
 #- name: Deploy experimental Kubernetes Gateway API Custom Resources Definitions (CRD)

@@ -5,23 +5,26 @@
 # Common variables
 #
 # If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
-#ingress_haproxy_version: "0.14.4"
 ingress_display_facts: "{{ global_display_facts }}"
-ingress_haproxy_helmvaluesfile: "/tmp/haproxy-ingress-values.yaml"
 #
 # End of common varibles
 ######################################################
 ######################################################
 # CentOS specific
 #
+## Next two lines to install Gateway API CRD's supported by HAProxy
+ingress_gwapicrds_version: "v0.4.1"
+centos_haproxy_gwapi_crdsurl: "github.com/kubernetes-sigs/gateway-api/config/crd?ref={{ingress_gwapicrds_version}}"
+
+ingress_haproxy_version: "0.14.9"
 centos_ingress: "haproxy"
-centos_haproxy_reponame: "haproxy-ingress"
-centos_haproxy_helm_repository: "https://haproxy-ingress.github.io/charts"
-centos_haproxy_helm_chart: "{{centos_ingress}} {{centos_haproxy_reponame}}/haproxy-ingress"
 centos_haproxy_namespace: "haproxy"
+centos_haproxy_helm_reponame: "haproxy-ingress"
+centos_haproxy_helm_repository: "https://haproxy-ingress.github.io/charts"
+centos_haproxy_helm_chart: "{{centos_haproxy_helm_reponame}} {{centos_haproxy_helm_reponame}}/haproxy-ingress"
+ingress_haproxy_helm_valuesfile: "/tmp/haproxy-ingress-values.yaml"
 # Next manifest required to let HAProxy access Gateway API CRD's"
 #centos_haproxy_gwapirbac_url: "https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/tests/config/experimental/gwapi-rbac.yaml"
 # End of CentOS specific
 ######################################################
-
 

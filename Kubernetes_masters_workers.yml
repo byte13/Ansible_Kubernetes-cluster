@@ -5,15 +5,16 @@
   become_user: root
 
   roles: 
-#  - dependencies
-#  - cri
-#  - k8s
-#  - cni
-#  - auditing
-#  - gatewayapi-crds
-#  - ingress-haproxy
+  - dependencies
+  - cri
+  - k8s
+  - cni
+  - auditing
+  - ingress-haproxy
+#  - ingress-kong
 #  - ingress-nginx-fabric
-  - ingress-kong
+#  - certmanager
+#  - rancher
 #  - admission
 #  - gitops
 #  - fluentbit
@@ -26,8 +27,8 @@
   become_user: root
 
   roles: 
-#  - dependencies
-#  - cri
-#  - k8s
-#  - cni
+  - dependencies
+  - cri
+  - k8s
+  - cni
 #  - cisbenchmark
