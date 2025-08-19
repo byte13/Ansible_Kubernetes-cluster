@@ -14,11 +14,14 @@ certmanager_helmvaluesfile: "/tmp/certmanager-values.yaml"
 ######################################################
 # CentOS specific
 #
+centos_certmanager_namespace: "{{centos_certmanager_helm_reponame}}"
+centos_certmanager_gpgkeyringfile: "cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg"
+centos_certmanager_gpgkeyringurl: "https://cert-manager.io/public-keys/{{ centos_certmanager_gpgkeyringfile }}"
+centos_certmanager_ocihelm_repository: "oci://quay.io/jetstack/charts/cert-manager:{{ certmanager_version }}"
 centos_certmanager_helm_reponame: "jetstack"
 centos_certmanager_helm_repository: "https://charts.jetstack.io"
 centos_certmanager_helm_chart: "{{centos_certmanager_helm_reponame}} {{centos_certmanager_helm_reponame}}/cert-manager"
 centos_certmanager_manifesturl: "https://github.com/cert-manager/cert-manager/releases/download/{{ certmanager_version }}/cert-manager.yaml"
-centos_certmanager_namespace: "{{centos_certmanager_helm_reponame}}"
 # End of CentOS specific
 ######################################################
 

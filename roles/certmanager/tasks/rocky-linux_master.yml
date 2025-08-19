@@ -39,16 +39,29 @@
     mode:  0640
   when: (inventory_hostname in groups['k8smasternodes'])
 
+# According to https://cert-manager.io/docs/installation/helm/#installing-with-helm
 - name: Install certmanager using Helm chart 
   become: no
   shell: |
+    # Installation from OCI Helm chart (recommanded)
+    curl -LO {{ centos_certmanager_gpgkeyringurl }}
+    helm install cert-manager {{ centos_certmanager_ocihelm_repository }} -f {{ certmanager_helmvaluesfile }} \
+                 --version {{ certmanager_version }} \
+                 --namespace cert-manager --create-namespace \
+                 --set crds.enabled=true \
+                 --verify \
+                 --keyring ./{{ centos_certmanager_gpgkeyringfile }}
+    # Instalation from legacy repository
     #helm install {{ centos_certmanager_helm_chart }} -f {{ certmanager_helmvaluesfile }} --create-namespace --namespace {{ centos_certmanager_namespace }} --version {{ certmanager_version }} --set crds.enabled=truer_namespace }}
     #helm install {{ centos_certmanager_helm_chart }} --create-namespace --namespace {{ centos_certmanager_namespace }} --version {{ certmanager_version }} --set crds.enabled=true
-    kubectl apply -f {{ centos_certmanager_manifesturl }}
+    #kubectl apply -f {{ centos_certmanager_manifesturl }}
   when: (inventory_hostname in groups['k8smasternodes']) 
 
 - name: "Remove {{ certmanager_helmvaluesfile }} from remote host"
   become: no
   file:
-    path: "{{ certmanager_helmvaluesfile }}"
+    path: "{{ item }}"
     state: absent
+  with_items:
+    - "{{ certmanager_helmvaluesfile }}"
+    - "{{ centos_certmanager_gpgkeyringfile }}"
