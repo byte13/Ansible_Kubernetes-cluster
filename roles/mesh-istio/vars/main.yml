@@ -1,0 +1,45 @@
+---
+# vars file for k8s istio mesh networking 
+#
+######################################################
+# Common variables
+#
+# If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
+mesh_display_facts: "{{ global_display_facts }}"
+mesh_gwapi_version: "{{ global_gwapi_version }}"
+mesh_gwapi_crdsurl: "github.com/kubernetes-sigs/gateway-api/config/crd?ref={{ mesh_gwapi_version }}"
+#
+# End of common varibles
+######################################################
+######################################################
+# CentOS specific
+#
+centos_mesh_implementation: "{{ global_mesh_implementation }}"
+#centos_istio_installtype: "istioctl"
+centos_istio_installtype: "helm"
+centos_istio_profile: "samples/bookinfo/demo-profile-no-gateways.yaml"
+
+# Variables for installation with istioctl
+centos_istio_namespace: "istio-system"
+centos_istio_installscripturl: "https://istio.io/downloadIstio"
+centos_istio_profile: "samples/bookinfo/demo-profile-no-gateways.yaml"
+# If next variable is set to "no", no demo application is installed; if required, set proper URL or local path on master node
+#centos_istio_demoappurl: "samples/bookinfo/platform/kube/bookinfo.yaml"
+centos_istio_demoappurl: "no"
+# If next variable is set to "no", kiali is NOT installed; if required, set proper URL or local path on master node
+#centos_kiali_demoappurl: "samples/addons/kiali.yaml"
+centos_kiali_demoappurl: "no"
+
+# Variables for installation with helm
+centos_istio_version: "v1.27"
+centos_istio_helm_reponame: "istio"
+centos_istio_helm_repository: "https://istio-release.storage.googleapis.com/charts"
+centos_istiobase_helm_chart: "{{centos_istio_helm_reponame}}-base {{centos_istio_helm_reponame}}/base"
+centos_istiobase_helm_valuesfile: "/tmp/istio-base-values.yaml"
+centos_istiod_helm_chart: "{{centos_istio_helm_reponame}}d {{centos_istio_helm_reponame}}/istiod"
+centos_istiod_helm_valuesfile: "/tmp/istiod-values.yaml"
+centos_istioingress_helm_chart: "{{centos_istio_helm_reponame}}-ingress {{centos_istio_helm_reponame}}/gateway"
+centos_istioingress_helm_valuesfile: "/tmp/istio-ingress-values.yaml"
+# End of CentOS specific
+######################################################
+

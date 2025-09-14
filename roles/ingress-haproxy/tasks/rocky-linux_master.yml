@@ -26,12 +26,18 @@
   when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_ingress == "haproxy") and (global_cni != "calico")
 
 # Installation according to https://haproxy-ingress.github.io/docs/configuration/gateway-api/
-- name: Install Gateway API CRD's using Helm chart 
+#- name: Install Gateway API CRD's using Helm chart 
+#  become: no
+#  shell: |
+#    #kubectl kustomize {{ centos_haproxy_gwapi_crdsurl }} | kubectl delete -f -
+#    kubectl kustomize {{ centos_haproxy_gwapi_crdsurl }} | kubectl apply -f -
+#  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
+
+- name: If not done, yet, install Gateway API CRD's using kubectl manifest
   become: no
   shell: |
-    #kubectl kustomize {{ centos_haproxy_gwapi_crdsurl }} | kubectl delete -f -
-    kubectl kustomize {{ centos_haproxy_gwapi_crdsurl }} | kubectl apply -f -
-  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
+    kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+    { kubectl kustomize "{{ centos_haproxy_gwapi_crdsurl }}" | kubectl apply -f -; }
 
 - name: Add HAproxy controller Helm repository
   become: no

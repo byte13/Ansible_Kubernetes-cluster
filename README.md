@@ -4,13 +4,12 @@ Note that the playbook detects if target OS is Ubuntu or Redhat/Centos/Rocky-Lin
 So there are variables specific to each OS.   
 
 Fully tested using :
-* Ansible 2.10.8 on Ubuntu 22.04 LTS
-* Rocky-linux 9.2 as Kubernetes cluster nodes (so it should work on CentOS 9 and RedHat 9 as well)
-* CRI-O 1.30 as container runtime
-* Kubernetes 1.30
-* Calico as Container Network Interface (CNI), but ready soon to install Antrea, Cilium or Weave instead (see roles/cni/README.md)
+* Ansible 2.16.3 on Ubuntu 24.04 LTS
+* Rocky-linux 9.6 as Kubernetes cluster nodes (so it should work on CentOS 9 and RedHat 9 as well)
+* CRI-O 1.32 as container runtime
+* Kubernetes 1.32
+* Calico as Container Network Interface (CNI) 
 * HAproxy as ingress controller
-* Kong as ingress controller
 
 ## Main steps to execute this Ansible playbook :
 1. On each target system, ensure you have an account allowed to sudo ALL with password
@@ -70,7 +69,28 @@ Fully tested using :
     │   ├── tasks
     │   │   └── main.yml
     │   ├── templates
+    │   │   ├── K8S_Audit-Policy_example.j2
+    │   │   ├── K8S_Audit-Policy_IBM-example.j2
     │   │   └── K8S_Audit-Policy_simple.j2
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    ├── certmanager
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   ├── main.yml
+    │   │   ├── rocky-linux_master.yml
+    │   │   └── rocky-linux_workers.yml
+    │   ├── templates
+    │   │   └── certmanager-values.j2
     │   ├── tests
     │   │   ├── inventory
     │   │   └── test.yml
@@ -86,8 +106,10 @@ Fully tested using :
     │   ├── README.md
     │   ├── tasks
     │   │   ├── main.yml
-    │   │   ├── rocky-linux_master.yml
-    │   │   └── rocky-linux_workers.yml
+    │   │   ├── rocky-linux_masters_calico.yml
+    │   │   ├── rocky-linux_masters_cilium.yml
+    │   │   ├── rocky-linux_workers_calico.yml
+    │   │   └── rocky-linux_workers_cilium.yml
     │   ├── templates
     │   │   ├── calico.conf.j2
     │   │   ├── calico_crd.j2
@@ -97,7 +119,7 @@ Fully tested using :
     │   │   └── test.yml
     │   └── vars
     │       └── main.yml
-    ├── cri-o
+    ├── cri
     │   ├── defaults
     │   │   └── main.yml
     │   ├── handlers
@@ -107,9 +129,10 @@ Fully tested using :
     │   ├── README.md
     │   ├── tasks
     │   │   ├── main.yml
-    │   │   └── rocky-linux.yml
+    │   │   ├── rocky-linux_containerd.yml
+    │   │   └── rocky-linux_cri-o.yml
     │   ├── templates
-    │   │   ├── 100-crio-bridge.conf.j2
+    │   │   ├── 100-cri-bridge.conf.j2
     │   │   ├── crio.conf.j2
     │   │   └── registries.conf.j2
     │   ├── tests
@@ -131,6 +154,26 @@ Fully tested using :
     │   │   ├── rocky-linux_master.yml
     │   │   └── rocky-linux_workers.yml
     │   ├── templates
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    ├── fluentbit
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   ├── main.yml
+    │   │   ├── rocky-linux_master.yml
+    │   │   └── rocky-linux_workers.yml
+    │   ├── templates
+    │   │   ├── fluent-bit-configmap.yaml
+    │   │   └── fluentbit-values.j2
     │   ├── tests
     │   │   ├── inventory
     │   │   └── test.yml
@@ -206,7 +249,27 @@ Fully tested using :
     │   │   ├── rocky-linux_master.yml
     │   │   └── rocky-linux_workers.yml
     │   ├── templates
-    │   │   └── kong-ingress-values.j2
+    │   │   ├── kong-ingress-values.j2
+    │   │   ├── kong-ingress-values_long.j2
+    │   │   └── kong-ingress-values_short.j2
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    ├── ingress-nginx-fabric
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   ├── main.yml
+    │   │   ├── rocky-linux_master.yml
+    │   │   └── rocky-linux_workers.yml
+    │   ├── templates
     │   ├── tests
     │   │   ├── inventory
     │   │   └── test.yml
@@ -248,7 +311,23 @@ Fully tested using :
     │   │   └── test.yml
     │   └── vars
     │       └── main.yml
-    └── oidc
+    ├── oidc
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── handlers
+    │   │   └── main.yml
+    │   ├── meta
+    │   │   └── main.yml
+    │   ├── README.md
+    │   ├── tasks
+    │   │   └── main.yml
+    │   ├── templates
+    │   ├── tests
+    │   │   ├── inventory
+    │   │   └── test.yml
+    │   └── vars
+    │       └── main.yml
+    └── rancher
         ├── defaults
         │   └── main.yml
         ├── handlers
@@ -257,17 +336,19 @@ Fully tested using :
         │   └── main.yml
         ├── README.md
         ├── tasks
-        │   └── main.yml
+        │   ├── main.yml
+        │   ├── rocky-linux_master.yml
+        │   └── rocky-linux_workers.yml
         ├── templates
+        │   └── rancher-values.j2
         ├── tests
         │   ├── inventory
         │   └── test.yml
         └── vars
             └── main.yml
+
 ```
 # TODO
-* Full tests with Kubernetes nodes running Ubuntu 22.04 LTS or higher
-* Full tests with Cilium CDN on both OS family
-* Full tests with Weave CDN on both OS family
-* Role to apply CIS Benchmarks 1.23 recommandations
+* Full tests with Cilium CNI
+* Role to apply CIS Benchmarks
 

@@ -53,8 +53,8 @@ centos_crio_startupfile: "/usr/lib/systemd/system/crio.service"
 # According to https://github.com/cri-o/packaging/blob/main/README.md
 centos_crio_reponame: "cri-o"
 centos_crio_repodesc: "Stable release of {{crio_version}}"
-centos_crio_repobaseurl: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/"
-centos_crio_repogpgkey: "https://pkgs.k8s.io/addons:/cri-o:/{{ crio_projectpath }}/rpm/repodata/repomd.xml.key"
+centos_crio_repobaseurl: "https://download.opensuse.org/repositories/isv:/cri-o:/{{ crio_projectpath }}/rpm/"
+centos_crio_repogpgkey: "{{ centos_crio_repobaseurl }}repodata/repomd.xml.key"
 centos_crio_pkgname: "cri-o"
 
 

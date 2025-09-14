@@ -13,11 +13,14 @@ ingress_display_facts: "{{ global_display_facts }}"
 # CentOS specific
 #
 ## Next two lines to install Gateway API CRD's supported by HAProxy
-ingress_gwapicrds_version: "v0.4.1"
+#ingress_gwapicrds_version: "v0.4.1"
+ingress_gwapicrds_version: "{{ global_gwapi_version }}"
 centos_haproxy_gwapi_crdsurl: "github.com/kubernetes-sigs/gateway-api/config/crd?ref={{ingress_gwapicrds_version}}"
 
 ingress_haproxy_version: "0.14.9"
 centos_ingress: "haproxy"
+centos_haproxy_http_nodeport: "31080"
+centos_haproxy_https_nodeport: "31443"
 centos_haproxy_namespace: "haproxy"
 centos_haproxy_helm_reponame: "haproxy-ingress"
 centos_haproxy_helm_repository: "https://haproxy-ingress.github.io/charts"

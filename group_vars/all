@@ -32,8 +32,8 @@ global_services_cidr: "10.200.0.0/16"
 # References:
 #         https://github.com/cri-o/cri-o
 #         https://kubernetes.io/releases/
-global_k8s_version: "v1.32"
-global_k8s_minorversion: "1.32.2"
+global_k8s_version: "v1.34"
+global_k8s_minorversion: "1.34.0"
 
 # dnf/yum repository for Kubernetes
 global_k8s_reponame1: "kubernetes"
@@ -52,7 +52,8 @@ global_proxy_ip:       "10.13.4.254"
 global_proxy_port:     "3128"
 global_http_proxy:     "http://{{global_proxy_ip}}:{{global_proxy_port}}"
 global_https_proxy:    "http://{{global_proxy_ip}}:{{global_proxy_port}}"
-global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+global_no_proxy:       ".lab.byte13.org,lab.byte13.org,.cluster.local,cluster.local,.svc,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+#global_no_proxy:       "lab.byte13.org,cluster.local,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
 # Set next variable to "yes" if one must wait for the master node(s) to be ready before proceeding
 global_wait_masters:   "yes"
@@ -64,6 +65,7 @@ global_cni:            "calico"
 #global_cni:            "cilium"
 
 # Define if Gateway API CRD's and experimental CRD's must be installed
+global_gwapi_version:        "v1.3.0"
 global_install_gwapicrds:    "yes"
 global_install_expgwapicrds: "no"
 
@@ -72,6 +74,9 @@ global_gitops: "no"
 
 # Define OpenSearch master server FQDN
 global_opensearchMaster_fqdn: "winux4100.lab.byte13.org"
+
+# Define mesh networking implementation
+global_mesh_implementation: "istio"
 #
 # End of common varibles
 ######################################################

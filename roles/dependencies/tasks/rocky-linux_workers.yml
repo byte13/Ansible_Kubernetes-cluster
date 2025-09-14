@@ -107,5 +107,6 @@
   loop:
     - container-selinux
     - curl
+    - podman
     - udica
   when: inventory_hostname in groups['k8sworkernodes']

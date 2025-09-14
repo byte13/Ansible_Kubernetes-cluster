@@ -10,6 +10,7 @@
   - k8s
   - cni
   - auditing
+  - mesh-istio
   - ingress-haproxy
 #  - ingress-kong
 #  - ingress-nginx-fabric

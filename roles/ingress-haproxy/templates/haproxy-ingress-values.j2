@@ -1,15 +1,12 @@
-# Expose HAProxy via host port on all cluster nodes
 controller:
   ingressClassResource:
     enabled: true
   kind: DaemonSet
-  daemonset:
-    useHostPort: true
+  # Expose HAProxy service via host port on all cluster nodes
+  #daemonset:
+  #  useHostPort: true
   service:
     type: NodePort
-
-# Possibly not required with latest versions of HAProxy
-# If required, see :  https://www.haproxy.com/documentation/kubernetes-ingress/gateway-api/enable-gateway-api/
-#  kubernetesGateway:
-#    enabled: true
-#    gatewayControllerName: haproxy.org/gateway-controller
+    nodePorts:
+      http:  {{ centos_haproxy_http_nodeport }}
+      https: {{ centos_haproxy_https_nodeport }}

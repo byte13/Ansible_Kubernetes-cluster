@@ -1,0 +1,128 @@
+---
+# tasks file for istio mesh networking 
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: mesh_display_facts == "yes"
+
+##################
+# istio mesh networking specific
+##################
+
+#- name: Set firewall rules for istio trafics on CentOS/Redhat/Rock-Linux
+#  firewalld:
+#     zone: public
+#     port: "{{ item }}"
+#    permanent: yes
+#     immediate: yes
+#     state: enabled
+#   loop:
+#     - 80/tcp
+#     - 443/tcp
+#     - 1024/tcp
+#   notify:
+#     - reload firewalld
+#   when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (centos_mesh_implementation == "istio")
+
+- name: If not done, yet, install Gateway API CRD's using kubectl manifest
+  become: no
+  shell: |
+    kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+    { kubectl kustomize "{{ mesh_gwapi_crdsurl }}" | kubectl apply -f -; }
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") 
+
+# Installation using istioctl script according to https://istio.io/latest/docs/setup/getting-started/ 
+- name: Install istio mesh networking using istioctl script
+  become: no
+  shell: |
+    curl -L https://istio.io/downloadIstio | sh -
+    export ISTIOCTLDIR=$(ls | grep -e "istio")
+    ${ISTIOCTLDIR}/bin/istioctl install
+    #${ISTIOCTLDIR}/bin/istioctl install -f ${ISTIOCTLDIR}/{{ centos_istio_profile }} -y
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "istioctl")
+
+# Next sections install istio mesh networking using Helm
+- name: Add istio mesh network Helm repository
+  become: no
+  shell: |
+    helm repo add {{ centos_istio_helm_reponame }} {{ centos_istio_helm_repository }}
+    helm repo update
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "helm")
+
+- name: Upload istio base helm chart value file to {{ centos_istiobase_helm_valuesfile }} 
+  become: no
+  template:
+    src:   istio-base-values.j2 
+    dest:  "{{ centos_istiobase_helm_valuesfile }}"
+    mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "helm")
+
+- name: Install istio base mesh network controller using Helm chart 
+  become: no
+  shell: |
+    helm install {{ centos_istiobase_helm_chart }} --create-namespace --namespace {{ centos_istio_namespace }} --version {{ centos_istio_version }} -f {{ centos_istiobase_helm_valuesfile }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "helm")
+
+- name: Remove {{ centos_istiobase_helm_valuesfile }} from remote host
+  become: no
+  file:
+    path: "{{ centos_istiobase_helm_valuesfile }}"
+    state: absent
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "helm")
+
+- name: Upload istiod helm chart value file to {{ centos_istiod_helm_valuesfile }} 
+  become: no
+  template:
+    src:   istiod-values.j2 
+    dest:  "{{ centos_istiod_helm_valuesfile }}"
+    mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "helm")
+
+- name: Install istiod mesh network controller using Helm chart 
+  become: no
+  shell: |
+    helm install {{ centos_istiod_helm_chart }} --create-namespace --namespace {{ centos_istio_namespace }} --version {{ centos_istio_version }} -f {{ centos_istiod_helm_valuesfile }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "helm")
+
+- name: Remove {{ centos_istiod_helm_valuesfile }} from remote host
+  become: no
+  file:
+    path: "{{ centos_istiod_helm_valuesfile }}"
+    state: absent
+
+- name: Upload istio-ingress helm chart value file to {{ centos_istioingress_helm_valuesfile }} 
+  become: no
+  template:
+    src:   istio-ingress-values.j2 
+    dest:  "{{ centos_istioingress_helm_valuesfile }}"
+    mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "helm")
+
+- name: Install istio-ingress mesh network controller using Helm chart 
+  become: no
+  shell: |
+    helm install {{ centos_istioingress_helm_chart }} --create-namespace --namespace {{ centos_istio_namespace }} --version {{ centos_istio_version }} -f {{ centos_istioingress_helm_valuesfile }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "helm")
+
+- name: Remove {{ centos_istioingress_helm_valuesfile }} from remote host
+  become: no
+  file:
+    path: "{{ centos_istioingress_helm_valuesfile }}"
+    state: absent
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_installtype == "helm")
+
+- name: Possibly install kiali (if required, set URL in centos_kiali_demoappurl in role main variable file)
+  become: no
+  shell: |
+    export ISTIOCTLDIR=$(ls | grep -e "istio")
+    kubectl apply -f ${ISTIOCTLDIR}/{{ centos_kiali_demoappurl }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_kiali_demoappurl != "no")
+
+- name: Possibly install istio demo application (if required, set URL in centos_istio_demoappurl in role main variable file)
+  become: no
+  shell: |
+    export ISTIOCTLDIR=$(ls | grep -e "istio")
+    kubectl apply -f ${ISTIOCTLDIR}/{{ centos_istio_demoappurl }}
+  when: (inventory_hostname in groups['k8smasternodes']) and (centos_mesh_implementation == "istio") and (centos_istio_demoappurl != "no")
+

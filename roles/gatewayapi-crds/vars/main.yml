@@ -5,7 +5,7 @@
 # Common variables
 #
 # If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
-ingress_gwapi_version: "v1.3.0"
+ingress_gwapi_version: "{{ global_gwapi_version }}"
 ingress_display_facts: "{{ global_display_facts }}"
 #
 # End of common varibles
