@@ -40,9 +40,6 @@ centos_cni:  "{{ global_cni }}"
 
 centos_host_interface: enp0s3
 
-# Antrea CNI on CentOS related variables 
-centos_antrea_url: "https://raw.githubusercontent.com/antrea-io/antrea/main/build/yamls/antrea.yml"
-
 # Calico CNI on CentOS related variables 
 #
 # URL to install Calico without operator
@@ -53,6 +50,17 @@ centos_calico_url: "https://raw.githubusercontent.com/projectcalico/calico/{{cal
 centos_calico_url1: "https://raw.githubusercontent.com/projectcalico/calico/{{calico_version}}/manifests/tigera-operator.yaml"
 centos_calico_url2: "https://raw.githubusercontent.com/projectcalico/calico/{{calico_version}}/manifests/custom-resources.yaml"
 centos_calico_netmgr_configfile: "/etc/NetworkManager/conf.d/calico.conf"
+
+# Cilium CNI on CentOS related variables 
+#
+centos_cilium_version: "1.18.5"
+centos_cilium_namespace: "kube-system"
+centos_cilium_helm_reponame: "cilium"
+centos_cilium_helm_repository: "https://helm.cilium.io/"
+centos_cilium_helm_chart: "{{centos_cilium_helm_reponame}} {{centos_cilium_helm_reponame}}/cilium"
+centos_cilium_helm_valuesfile: "/tmp/cilium-helm-values.yaml"
+centos_cilium_podscidr: "10.100.0.0"
+centos_cilium_usekubeadmpodscidr: "true"
 
 #
 # End of CentOS specific

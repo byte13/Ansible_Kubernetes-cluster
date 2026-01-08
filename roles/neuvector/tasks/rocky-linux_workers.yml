@@ -1,0 +1,27 @@
+---
+# tasks file for neuvector 
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: ingress_display_facts == "yes"
+
+##################
+# neuvector specific
+##################
+
+- name: Set firewall rules for ingress trafics on CentOS/Redhat/Rocky-Linux
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    # For ingress trafics via ingress controllers 
+    - 8080/tcp
+    - 8443/tcp
+  notify:
+    - reload firewalld
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (inventory_hostname in groups['k8sworkernodes'])
+

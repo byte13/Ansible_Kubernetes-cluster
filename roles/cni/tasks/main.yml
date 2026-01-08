@@ -5,13 +5,13 @@
   import_tasks: rocky-linux_masters_calico.yml
   when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes']) and (global_cni == "calico")
 
-- name: Install cilium CNI on master nodes RedHat 
-  import_tasks: rocky-linux_masters_cilium.yml
-  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
-
 - name: Install calico CNI on worker nodes RedHat 
   import_tasks: rocky-linux_workers_calico.yml
   when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8sworkernodes']) and (global_cni == "calico")
+  
+- name: Install cilium CNI on master nodes RedHat 
+  import_tasks: rocky-linux_masters_cilium.yml
+  when: (ansible_facts['os_family']|lower == 'redhat') and (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 - name: Install cilium CNI on worker nodes RedHat 
   import_tasks: rocky-linux_workers_cilium.yml

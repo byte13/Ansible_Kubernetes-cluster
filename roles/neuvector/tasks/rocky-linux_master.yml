@@ -1,0 +1,74 @@
+---
+# tasks file for neuvector
+
+- name: Show facts available on the system
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: neuvector_display_facts == "yes"
+
+##################
+# neuvector specific
+##################
+
+- name: Set firewall rules for neuvector trafics on CentOS/Redhat/Rock-Linux
+  firewalld:
+    zone: public
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - 8080/tcp
+    - 8443/tcp
+  notify:
+    - reload firewalld
+  when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni != "calico")
+
+- name: Add neuvector controller Helm repository
+  become: no
+  shell: |
+    helm repo add {{ centos_neuvector_helm_reponame }} {{ centos_neuvector_helm_repository }}
+    helm repo update
+  when: (inventory_hostname in groups['k8smasternodes']) 
+
+- name: Upload neuvector crd helm chart value file to {{ neuvectorcrd_helmvaluesfile }} 
+  become: no
+  template:
+    src:   "{{ neuvectorcrd_helmvaluestemplate }}" 
+    dest:  "{{ neuvectorcrd_helmvaluesfile }}"
+    mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes'])
+
+- name: Install neuvector crd using Helm chart 
+  become: no
+  shell: |
+    #helm install {{ centos_neuvectorcrd_helm_chart }} -f {{ neuvectorcrd_helmvaluesfile }} --create-namespace --namespace {{ centos_neuvector_namespace }}
+    helm install {{ centos_neuvectorcrd_helm_chart }} --create-namespace --namespace {{ centos_neuvector_namespace }}
+  when: (inventory_hostname in groups['k8smasternodes']) 
+
+- name: "Remove {{ neuvectorcrd_helmvaluesfile }} from remote host"
+  become: no
+  file:
+    path: "{{ neuvectorcrd_helmvaluesfile }}"
+    state: absent
+
+- name: Upload neuvector core helm chart value file to {{ neuvectorcore_helmvaluesfile }} 
+  become: no
+  template:
+    src:   "{{ neuvectorcore_helmvaluestemplate }}" 
+    dest:  "{{ neuvectorcore_helmvaluesfile }}"
+    mode:  0640
+  when: (inventory_hostname in groups['k8smasternodes'])
+
+- name: Install neuvector core using Helm chart 
+  become: no
+  shell: |
+    #helm install {{ centos_neuvectorcore_helm_chart }} -f {{ neuvectorcore_helmvaluesfile }} --create-namespace --namespace {{ centos_neuvector_namespace }}
+    helm install {{ centos_neuvectorcore_helm_chart }} --set crdwebhook.enabled=false --namespace {{ centos_neuvector_namespace }}
+  when: (inventory_hostname in groups['k8smasternodes']) 
+
+- name: "Remove {{ neuvectorcore_helmvaluesfile }} from remote host"
+  become: no
+  file:
+    path: "{{ neuvectorcore_helmvaluesfile }}"
+    state: absent

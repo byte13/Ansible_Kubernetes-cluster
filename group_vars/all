@@ -45,7 +45,7 @@ global_k8s_repogpgkey1: "https://pkgs.k8s.io/core:/stable:/{{ global_k8s_version
 global_reset_cluster: "no"
 
 # Is a proxy used to access Internet (yes/no)
-global_proxy_required: "yes"
+global_proxy_required: "no"
 # Respective proxy variables to be adjusted to your context
 global_proxy_profile:  "/etc/profile.d/http_proxy.sh"
 global_proxy_ip:       "10.13.4.254"
@@ -61,8 +61,8 @@ global_wait_seconds:   120
 
 # Choose CNI type. Could be : calico, cilium.
 # Calico, only, is fully tested, yet
-global_cni:            "calico"
-#global_cni:            "cilium"
+#global_cni:            "calico"
+global_cni:            "cilium"
 
 # Define if Gateway API CRD's and experimental CRD's must be installed
 global_gwapi_version:        "v1.3.0"

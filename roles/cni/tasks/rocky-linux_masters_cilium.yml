@@ -25,7 +25,31 @@
     - reload firewalld
   when: ((ansible_facts['os_family']|lower == 'redhat') or (ansible_facts['os_family']|lower == 'rocky')) and (global_cni == "cilium")
 
-- name: Install Cilium CLI
+- name: Download Cilium CLI without proxy and verify checksum
+  become: yes
+  shell: |
+    CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
+    CLI_ARCH=amd64
+    if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
+    curl -L --fail --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+    sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
+    tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
+    rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium") and (global_proxy_required != "yes")
+
+- name: Download Hubble CLI without proxy and verify checksum
+  become: yes
+  shell: |
+    HUBBLE_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/hubble/master/stable.txt)
+    HUBBLE_ARCH=amd64
+    if [ "$(uname -m)" = "aarch64" ]; then HUBBLE_ARCH=arm64; fi
+    curl -L --fail --remote-name-all https://github.com/cilium/hubble/releases/download/$HUBBLE_VERSION/hubble-linux-${HUBBLE_ARCH}.tar.gz{,.sha256sum}
+    sha256sum --check hubble-linux-${HUBBLE_ARCH}.tar.gz.sha256sum
+    tar xzvfC hubble-linux-${HUBBLE_ARCH}.tar.gz /usr/local/bin
+    rm hubble-linux-${HUBBLE_ARCH}.tar.gz{,.sha256sum}
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium") and (cilium_activate_hubble == "yes") and (global_proxy_required != "yes")
+
+- name: Download Cilium CLI via proxy and verify checksum
   become: yes
   shell: |
     CILIUM_CLI_VERSION=$(curl --proxy {{ global_https_proxy }} -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
@@ -35,9 +59,9 @@
     sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
     tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
     rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
-  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium") and (global_proxy_required == "yes") 
 
-- name: Install Hubble CLI
+- name: Download Hubble CLI via proxy and verify checksum
   become: yes
   shell: |
     HUBBLE_VERSION=$(curl -proxy {{ global_https_proxy }} -s https://raw.githubusercontent.com/cilium/hubble/master/stable.txt)
@@ -47,13 +71,13 @@
     sha256sum --check hubble-linux-${HUBBLE_ARCH}.tar.gz.sha256sum
     tar xzvfC hubble-linux-${HUBBLE_ARCH}.tar.gz /usr/local/bin
     rm hubble-linux-${HUBBLE_ARCH}.tar.gz{,.sha256sum}
-  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium") and (cilium_activate_hubble == "yes")
+  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium") and (cilium_activate_hubble == "yes") and (global_proxy_required == "yes") 
 
-- name: Install Cilium CNI using Cilium CLI 
+- name: Install Cilium CNI using Cilium CLI
   become: no
   # k8s.requireIPv4PodCIDR="true" means that POD CIDR is inherited from the one specified during kubeadm init
   shell: |
-    cilium install --version={{ cilium_version }} --set clusterPoolIPv4PodCIDRList={{ cni_pods_cidr }}
+    cilium install --version={{ cilium_version }} --set clusterPoolIPv4PodCIDRList={{ centos_cilium_podscidr }}
   when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
 - name: Enable Hubble observatory in Cilium using Cilium CLI
@@ -62,9 +86,29 @@
     cilium hubble enable
   when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium") and (cilium_activate_hubble == "yes")
 
-- name: Add Cilium CNI Helm repository
-  become: no
-  shell: |
-    helm repo add cilium {{ cilium_helm_repository }}   
-  when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
+# - name: Add Cilium CNI Helm repository
+#   become: no
+#   shell: |
+#     helm repo add cilium {{ centos_cilium_helm_repository }}   
+#   when: (inventory_hostname in groups['k8smasternodes']) and (global_cni == "cilium")
 
+# - name: Upload Clilium controller helm chart value file to {{ centos_cilium_helm_valuesfile }} 
+#   become: no
+#   template:
+#     src:   cilium-helm-values.j2 
+#     dest:  "{{ centos_cilium_helm_valuesfile}}"
+#     mode:  0640
+#   when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+
+# - name: Install CILIUM CNI using Helm chart 
+#   become: no
+#   shell: |
+#     # helm install {{ centos_cilium_helm_chart }} --create-namespace --namespace {{ centos_cilium_namespace }} --version {{ ingress_haproxy_version }} -f {{ ingress_haproxy_helm_valuesfile }}
+#     helm install cilium cilium/cilium --version {{ centos_cilium_version }} --namespace {{ centos_cilium_namespace }} --set hostFirewall.enabled=true
+#   when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
+
+# - name: "Remove {{ centos_cilium_helm_valuesfile }} from remote host"
+#   become: no
+#   file:
+#     path: "{{ centos_cilium_helm_valuesfile }}"
+#     state: absent

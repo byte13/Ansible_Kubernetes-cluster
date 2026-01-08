@@ -1,0 +1,31 @@
+---
+# vars file for neuvector 
+#
+######################################################
+# Common variables
+#
+# If one wants to display the ansible facts while running the playbook, set the following variable to "yes"
+neuvector_version: "2.8.8"
+neuvector_display_facts: "{{ global_display_facts }}"
+neuvectorcrd_helmvaluestemplate: "neuvectorcrd-values.j2"
+neuvectorcrd_helmvaluesfile: "/tmp/neuvectorcrd-values.yaml"
+neuvectorcore_helmvaluestemplate: "neuvectorcore-values.j2"
+neuvectorcore_helmvaluesfile: "/tmp/neuvectorcore-values.yaml"
+#
+# End of common varibles
+######################################################
+######################################################
+# CentOS specific
+#
+centos_neuvector_helm_reponame: "neuvector"
+centos_neuvector_helm_repository: "https://neuvector.github.io/neuvector-helm/"
+
+centos_neuvectorcrd_helm_releasename: "neuvectorcrd-{{ neuvector_version }}"
+centos_neuvectorcore_helm_releasename: "neuvectorcore-{{ neuvector_version }}"
+centos_neuvectorcrd_helm_chart: "{{centos_neuvectorcrd_helm_releasename}} {{centos_neuvector_helm_reponame}}/crd"
+centos_neuvectorcore_helm_chart: "{{centos_neuvectorcore_helm_releasename}} {{centos_neuvector_helm_reponame}}/core"
+
+centos_neuvector_namespace: "{{centos_neuvector_helm_reponame}}"
+# End of CentOS specific
+######################################################
+
