@@ -17,7 +17,6 @@ mesh_gwapi_crdsurl: "github.com/kubernetes-sigs/gateway-api/config/crd?ref={{ me
 centos_mesh_implementation: "{{ global_mesh_implementation }}"
 #centos_istio_installtype: "istioctl"
 centos_istio_installtype: "helm"
-centos_istio_profile: "samples/bookinfo/demo-profile-no-gateways.yaml"
 
 # Variables for installation with istioctl
 centos_istio_namespace: "istio-system"

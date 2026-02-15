@@ -1,10 +1,7 @@
 controller:
+  kind: DaemonSet
   ingressClassResource:
     enabled: true
-  kind: DaemonSet
-  # Expose HAProxy service via host port on all cluster nodes
-  #daemonset:
-  #  useHostPort: true
   service:
     type: NodePort
     nodePorts:

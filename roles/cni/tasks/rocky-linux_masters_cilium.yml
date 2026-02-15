@@ -103,7 +103,7 @@
 # - name: Install CILIUM CNI using Helm chart 
 #   become: no
 #   shell: |
-#     # helm install {{ centos_cilium_helm_chart }} --create-namespace --namespace {{ centos_cilium_namespace }} --version {{ ingress_haproxy_version }} -f {{ ingress_haproxy_helm_valuesfile }}
+#     # helm install {{ centos_cilium_helm_chart }} --create-namespace --namespace {{ centos_cilium_namespace }} --version {{ ingress_cilium_version }} -f {{ ingress_cilium_helm_valuesfile }}
 #     helm install cilium cilium/cilium --version {{ centos_cilium_version }} --namespace {{ centos_cilium_namespace }} --set hostFirewall.enabled=true
 #   when: (inventory_hostname in groups['k8smasternodes']) and (centos_cni == "cilium")
 

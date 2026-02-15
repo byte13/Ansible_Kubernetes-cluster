@@ -23,27 +23,19 @@
     path: "{{ item }}"
     state: absent
   loop:
-  - "/etc/yum.repos.d/{{ centos_containerd_reponame }}.repo"
+  - "/etc/yum.repos.d/{{ centos_docker_reponame }}.repo"
 
-#- name: Remove current libcontainer and CRI repositories 
-#  file:
-#    path: "{{ item }}"
-#    state: absent
-#  with_items:
-#  - "/etc/yum.repos.d/{{ centos_containerd_reponame1 }}.repo"
-#  - "/etc/yum.repos.d/{{ centos_containerd_reponame2 }}.repo"
-
-- name: Add containers libraries repository {{ centos_containerd_repobaseurl }} into /etc/yum.repos.d/{{ centos_containerd_reponame }}.repo
+- name: Add containers libraries repository {{ centos_docker_repobaseurl }} into /etc/yum.repos.d/{{ centos_docker_reponame }}.repo
   yum_repository:
-    name: "{{ centos_containerd_reponame }}"
+    name: "{{ centos_docker_reponame }}"
     state: present
-    description: "{{ centos_containerd_repodesc }}"
-    baseurl: "{{ centos_containerd_repobaseurl }}"
-    #gpgkey: "{{ centos_containerd_repogpgkey }}"
-    gpgcheck: yes
+    description: "{{ centos_docker_repodesc }}"
+    baseurl: "{{ centos_docker_repobaseurl }}"
+    #gpgkey: "{{ centos_docker_repogpgkey }}"
+    #gpgcheck: no
 
 # Installation of containerd 
-- name: "Install containerd {{ containerd_version }} packages: {{ centos_containerd_pkgname }}"
+- name: "Install containerd packages: {{ centos_containerd_pkgname }}"
   dnf:
     name:
       - "{{ centos_containerd_pkgname }}"

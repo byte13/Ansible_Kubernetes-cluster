@@ -17,8 +17,8 @@ global_display_facts:  "no"
 global_upgrade_node:   "no"
 
 # Required CRI
-global_cri: "cri-o"
-#global_cri: "containerd"
+#global_cri: "cri-o"
+global_cri: "containerd"
 
 # CIDR range for PODS network
 global_pods_cidr: "10.100.0.0/16"
@@ -32,20 +32,22 @@ global_services_cidr: "10.200.0.0/16"
 # References:
 #         https://github.com/cri-o/cri-o
 #         https://kubernetes.io/releases/
-global_k8s_version: "v1.34"
-global_k8s_minorversion: "1.34.0"
+global_k8s_version: "v1.35"
+global_k8s_minorversion: "1.35.0"
 
 # dnf/yum repository for Kubernetes
 global_k8s_reponame1: "kubernetes"
 global_k8s_repodesc1: "Kubernetes repository"
 global_k8s_repobaseurl1: "https://pkgs.k8s.io/core:/stable:/{{ global_k8s_version }}/rpm/"
+#global_k8s_repobaseurl1: "https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/{{ global_k8s_version }}/rpm/repodata/repomd.xml"
 global_k8s_repogpgkey1: "https://pkgs.k8s.io/core:/stable:/{{ global_k8s_version }}/rpm/repodata/repomd.xml.key"
+#global_k8s_repogpgkey1: "https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/{{ global_k8s_version }}/rpm/repodata/repomd.xml.key"
 
 # Define if it is a re-installation of an running cluster (which requires to reset the cluster)
 global_reset_cluster: "no"
 
 # Is a proxy used to access Internet (yes/no)
-global_proxy_required: "no"
+global_proxy_required: "yes"
 # Respective proxy variables to be adjusted to your context
 global_proxy_profile:  "/etc/profile.d/http_proxy.sh"
 global_proxy_ip:       "10.13.4.254"
@@ -65,7 +67,7 @@ global_wait_seconds:   120
 global_cni:            "cilium"
 
 # Define if Gateway API CRD's and experimental CRD's must be installed
-global_gwapi_version:        "v1.3.0"
+global_gwapicrds_version:    "v1.4.1"
 global_install_gwapicrds:    "yes"
 global_install_expgwapicrds: "no"
 

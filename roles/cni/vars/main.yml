@@ -13,8 +13,8 @@ cni_display_facts: "{{ global_display_facts }}"
 cni_pods_cidr: "{{ global_pods_cidr }}"
 cni_pods_maxmasklength: "24"
 
-# Version of Calico to be installed
-calico_version: "v3.26.1"
+# Version of Calico to be installed, see https://github.com/projectcalico/calico/releases
+calico_version: "v3.30.6"
 calico_crd_tempfile: "/tmp/calico_crd.yml"
 calico_ippools_tempfile: "/tmp/calico_ippools.yaml"
 
@@ -23,8 +23,9 @@ ciclium_cli_url: "https://github.com/cilium/cilium-cli/releases/download/${CILIU
 cilium_helm_repository: "https://helm.cilium.io/"
 cilium_helm_chart: "cilium/cilium"
 cilium_helm_repo: "cilium"
-cilium_version: "1.17.2"
-cilium_activate_hubble: "no"
+# To find latest version, see https://github.com/cilium/cilium/releases
+cilium_version: "1.19.0"
+cilium_activate_hubble: "yes"
 #
 # End of common varibles
 ######################################################

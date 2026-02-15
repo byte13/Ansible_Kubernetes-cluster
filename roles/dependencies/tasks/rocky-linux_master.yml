@@ -109,6 +109,8 @@
     - container-selinux
     - curl
     - git
+    - openssl
+    - tar
   when: inventory_hostname in groups['k8smasternodes']
 
 - name: "Get script via proxy to install Helm"

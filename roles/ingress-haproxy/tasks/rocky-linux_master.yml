@@ -33,11 +33,18 @@
 #    kubectl kustomize {{ centos_haproxy_gwapi_crdsurl }} | kubectl apply -f -
 #  when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
 
+#- name: If not done, yet, install Gateway API CRD's using kubectl manifest
+#  become: no
+#  shell: |
+#    kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+#    { kubectl kustomize "{{ centos_haproxy_gwapi_crdsurl }}" | kubectl apply -f -; }
+
 - name: If not done, yet, install Gateway API CRD's using kubectl manifest
   become: no
   shell: |
-    kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
-    { kubectl kustomize "{{ centos_haproxy_gwapi_crdsurl }}" | kubectl apply -f -; }
+    #kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+    #{ kubectl apply --server-side -f {{ centos_haproxy_gwapi_crdsurl }} }
+    kubectl apply --server-side -f {{ centos_haproxy_gwapi_crdsurl }}
 
 - name: Add HAproxy controller Helm repository
   become: no
@@ -59,7 +66,8 @@
 - name: Install HAproxy controller using Helm chart 
   become: no
   shell: |
-    helm install {{ centos_haproxy_helm_chart }} --create-namespace --namespace {{ centos_haproxy_namespace }} --version {{ ingress_haproxy_version }} -f {{ ingress_haproxy_helm_valuesfile }}
+    #helm install {{ centos_haproxy_helm_chart }} --create-namespace --namespace {{ centos_haproxy_namespace }} --version {{ ingress_haproxy_version }} -f {{ ingress_haproxy_helm_valuesfile }}
+    helm install {{ centos_haproxy_helm_chart }} --create-namespace --namespace {{ centos_haproxy_namespace }} -f {{ ingress_haproxy_helm_valuesfile }}
   when: (inventory_hostname in groups['k8smasternodes']) and (centos_ingress == "haproxy")
 
 - name: "Remove {{ ingress_haproxy_helm_valuesfile }} from remote host"

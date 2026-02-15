@@ -5,19 +5,19 @@
   become_user: root
 
   roles: 
-#  - dependencies
-#  - cri
+  - dependencies
+  - cri
 #  - k8s
-  - cni
-  - auditing
-#  - mesh-istio
-  - ingress-haproxy
+#  - cni
+#  - auditing
 #  - ingress-kong
+#  - ingress-haproxy
 #  - ingress-nginx-fabric
+#  - mesh-istio
+#  - admission
 #  - certmanager
 #  - neuvector
 #  - rancher
-#  - admission
 #  - gitops
 #  - fluentbit
 #  - cisbenchmark
@@ -31,6 +31,6 @@
   roles: 
   - dependencies
   - cri
-  - k8s
-  - cni
+#  - k8s
+#  - cni
 #  - cisbenchmark

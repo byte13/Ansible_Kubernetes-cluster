@@ -14,7 +14,8 @@ ingress_display_facts: "{{ global_display_facts }}"
 #
 
 ## Next three lines to install Gateway API CRD's supported by Kong
-ingress_gwapicrds_version: "v1.3.0"
+#ingress_gwapicrds_version: "v1.4.1"
+ingress_gwapicrds_version: "{{ global_gwapicrds_version }}"
 centos_kong_gwapi_crdsurl: "https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ingress_gwapicrds_version}}/standard-install.yaml"
 #centos_kong_gwapi_expcrdsurl: "https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ingress_gwapicrds_version}}/experimental-install.yaml"
 

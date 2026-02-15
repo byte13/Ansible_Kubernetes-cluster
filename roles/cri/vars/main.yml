@@ -5,10 +5,6 @@
 # Common variables
 #
 #
-# Easier procedure available on : https://github.com/cri-o/packaging/blob/main/README.md
-crio_version: "{{ global_k8s_version }}"
-crio_minorversion: "{{ global_k8s_minorversion }}"
-crio_projectpath: "stable:/{{ crio_version }}"
 #critools_version: "{{ global_k8s_minorversion }}"
 
 # CRI pods subnet
@@ -42,8 +38,12 @@ cri_containerd_configfile: "/etc/containerd/config.toml"
 # End of common varibles
 ######################################################
 ######################################################
-# Rocky Linux (CentOS) specific
+# Rocky Linux (CentOS) and cri-o specific variables
 #
+# Easier procedure available on : https://github.com/cri-o/packaging/blob/main/README.md
+crio_version: "{{ global_k8s_version }}"
+crio_minorversion: "{{ global_k8s_minorversion }}"
+crio_projectpath: "stable:/{{ crio_version }}"
 
 # Next line to define CRI-O system startup environment file
 centos_crio_envfile: "/etc/sysconfig/crio"
@@ -52,23 +52,26 @@ centos_crio_startupfile: "/usr/lib/systemd/system/crio.service"
 
 # According to https://github.com/cri-o/packaging/blob/main/README.md
 centos_crio_reponame: "cri-o"
-centos_crio_repodesc: "Stable release of {{crio_version}}"
+centos_crio_repodesc: "Stable release of {{ crio_version }}"
 centos_crio_repobaseurl: "https://download.opensuse.org/repositories/isv:/cri-o:/{{ crio_projectpath }}/rpm/"
 centos_crio_repogpgkey: "{{ centos_crio_repobaseurl }}repodata/repomd.xml.key"
 centos_crio_pkgname: "cri-o"
+# End of CentOS and cri-o specific variables
+######################################################
 
-
+######################################################
+# Rocky Linux (CentOS) and containerd specific variables
 # Next line to define containerd system startup environment file
-centos_containerd_envfile: "/etc/sysconfig/"
+centos_containerd_envfile: "/etc/sysconfig"
 # Next line to define containerd system startup file
 centos_containerd_startupfile: "/usr/lib/systemd/system/containerd.service"
 
 # Next repo required to install containerd CRI
 centos_docker_reponame: "docker-ce-stable"
 centos_docker_repodesc: "Stable release of docker-ce"
-centos_docker_repo: "https://download.docker.com/linux/centos/docker-ce.repo"
-centos_contained_pkgname: "containerd.io"
-
+centos_docker_repobaseurl: "https://download.docker.com/linux/centos/docker-ce.repo"
+#centos_docker_repogpgkey: "{{ centos_docker_repobaseurl }}/repodata/repomd.xml.key"
+centos_containerd_pkgname: "containerd.io"
 #
-# End of CentOS specific
+# End of CentOS and containerd specific variables
 ######################################################
